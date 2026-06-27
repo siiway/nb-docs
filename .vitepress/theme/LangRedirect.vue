@@ -1,12 +1,9 @@
 <!--
-  When a user visits a path without a language prefix (e.g. /getting-started),
-  VitePress renders a 404. This component in the #not-found slot detects this
-  and redirects to the browser-language version (/en/... or /zh/...).
-
-  If the path has a language prefix but no version (e.g. /zh/getting-started),
-  it redirects to the latest version (/zh/v0.4/getting-started).
-
-  If the path already has both language and version, it's a real 404.
+  Handles:
+  1. Mangled paths from language switcher (e.g. /zh/en/v0.4/... -> /en/v0.4/...)
+  2. Paths with language but no version (e.g. /zh/getting-started -> /zh/v0.4/getting-started)
+  3. Paths without any prefix (e.g. /getting-started -> /en/v0.4/getting-started)
+  4. Real 404s (path has language + version but page doesn't exist)
 -->
 <script setup lang="ts">
 import { useData, useRoute, useRouter, withBase } from 'vitepress'
@@ -19,19 +16,24 @@ const { theme } = useData()
 const redirecting = ref(false)
 
 const LATEST = 'v0.4'
-const VERSIONS = ['v0.4', 'v0.3']
 
 function detectLang(): string {
-  const lang = (
-    navigator.language ||
-    (navigator as any).userLanguage ||
-    'en'
-  ).toLowerCase()
+  if (typeof navigator === 'undefined') return 'en'
+  const lang = (navigator.language || (navigator as any).userLanguage || 'en').toLowerCase()
   return lang.startsWith('zh') ? 'zh' : 'en'
 }
 
 function resolveTarget(rawPath: string): string | null {
   const cleanPath = rawPath.replace(/\.html$/, '')
+
+  // Fix mangled paths from language switcher: /zh/en/v0.4/... or /en/zh/v0.4/...
+  const mangled = cleanPath.match(/^\/(zh|en)\/(zh|en)\/(v\d+\.\d+)(\/.*)?$/)
+  if (mangled) {
+    const innerLang = mangled[2]
+    const version = mangled[3]
+    const rest = mangled[4] || '/'
+    return `/${innerLang}/${version}${rest}`
+  }
 
   // Already has language + version -> real 404
   if (/^\/(en|zh)\/v\d/.test(cleanPath)) return null

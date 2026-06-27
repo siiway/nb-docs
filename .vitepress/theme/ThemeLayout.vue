@@ -4,6 +4,7 @@ import { useData } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import { nextTick, provide } from 'vue'
 import LangRedirect from './LangRedirect.vue'
+import LangSwitchFix from './LangSwitchFix.vue'
 
 const { isDark } = useData()
 
@@ -56,6 +57,7 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
       <LangRedirect />
     </template>
   </DefaultTheme.Layout>
+  <LangSwitchFix />
 </template>
 
 <style>
