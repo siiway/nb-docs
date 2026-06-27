@@ -1,78 +1,135 @@
 import { defineConfig } from 'vitepress'
 
-const enSidebar = [
-  {
-    text: 'Guide',
-    items: [
-      { text: 'Getting Started', link: '/getting-started' },
-      { text: 'Configuration', link: '/configuration' },
-      { text: 'Rules', link: '/rules' },
-      { text: 'User Commands', link: '/user-commands' },
-      { text: 'Platform Support', link: '/platform-support' },
-    ],
-  },
-  {
-    text: 'Drivers',
-    items: [
-      { text: 'Overview', link: '/drivers/' },
-      { text: 'NapCat (QQ)', link: '/drivers/napcat' },
-      { text: 'Discord', link: '/drivers/discord' },
-      { text: 'Telegram', link: '/drivers/telegram' },
-      { text: 'Feishu / Lark', link: '/drivers/feishu' },
-      { text: 'DingTalk', link: '/drivers/dingtalk' },
-      { text: 'Yunhu', link: '/drivers/yunhu' },
-      { text: 'KOOK', link: '/drivers/kook' },
-      { text: 'Matrix', link: '/drivers/matrix' },
-      { text: 'Signal', link: '/drivers/signal' },
-      { text: 'Slack', link: '/drivers/slack' },
-      { text: 'Microsoft Teams', link: '/drivers/teams' },
-      { text: 'Google Chat', link: '/drivers/googlechat' },
-      { text: 'Mattermost', link: '/drivers/mattermost' },
-      { text: 'VoceChat', link: '/drivers/vocechat' },
-      { text: 'Rocket.Chat', link: '/drivers/rocketchat' },
-      { text: 'Webhook', link: '/drivers/webhook' },
-    ],
-  },
-]
+const CURRENT_VERSION = 'v0.4'
+const VERSIONS = ['v0.4', 'v0.3']
 
-const zhSidebar = [
-  {
-    text: '指南',
-    items: [
-      { text: '快速开始', link: '/zh/getting-started' },
-      { text: '配置文件', link: '/zh/configuration' },
-      { text: '规则配置', link: '/zh/rules' },
-      { text: '用户指令', link: '/zh/user-commands' },
-      { text: '平台支持状态', link: '/zh/platform-support' },
-    ],
-  },
-  {
-    text: '驱动器',
-    items: [
-      { text: '概览', link: '/zh/drivers/' },
-      { text: 'NapCat (QQ)', link: '/zh/drivers/napcat' },
-      { text: 'Discord', link: '/zh/drivers/discord' },
-      { text: 'Telegram', link: '/zh/drivers/telegram' },
-      { text: '飞书 / Lark', link: '/zh/drivers/feishu' },
-      { text: '钉钉', link: '/zh/drivers/dingtalk' },
-      { text: '云湖', link: '/zh/drivers/yunhu' },
-      { text: 'KOOK', link: '/zh/drivers/kook' },
-      { text: 'Matrix', link: '/zh/drivers/matrix' },
-      { text: 'Signal', link: '/zh/drivers/signal' },
-      { text: 'Slack', link: '/zh/drivers/slack' },
-      { text: 'Microsoft Teams', link: '/zh/drivers/teams' },
-      { text: 'Google Chat', link: '/zh/drivers/googlechat' },
-      { text: 'Mattermost', link: '/zh/drivers/mattermost' },
-      { text: 'VoceChat', link: '/zh/drivers/vocechat' },
-      { text: 'Rocket.Chat', link: '/zh/drivers/rocketchat' },
-      { text: 'Webhook', link: '/zh/drivers/webhook' },
-    ],
-  },
-]
+function enSidebar(version: string) {
+  const prefix = `/en/${version}`
+  return [
+    {
+      text: 'Guide',
+      items: [
+        { text: 'Getting Started', link: `${prefix}/getting-started` },
+        { text: 'Configuration', link: `${prefix}/configuration` },
+        { text: 'Rules', link: `${prefix}/rules` },
+        { text: 'User Commands', link: `${prefix}/user-commands` },
+        { text: 'Platform Support', link: `${prefix}/platform-support` },
+      ],
+    },
+    {
+      text: 'Drivers',
+      items: version === 'v0.4'
+        ? [
+            { text: 'Overview', link: `${prefix}/drivers/` },
+            { text: 'QQ', link: `${prefix}/drivers/qq` },
+            { text: 'Discord', link: `${prefix}/drivers/discord` },
+            { text: 'Telegram', link: `${prefix}/drivers/telegram` },
+            { text: 'Feishu / Lark', link: `${prefix}/drivers/feishu` },
+            { text: 'DingTalk', link: `${prefix}/drivers/dingtalk` },
+            { text: 'Yunhu', link: `${prefix}/drivers/yunhu` },
+            { text: 'KOOK', link: `${prefix}/drivers/kook` },
+            { text: 'Matrix', link: `${prefix}/drivers/matrix` },
+            { text: 'Signal', link: `${prefix}/drivers/signal` },
+            { text: 'Slack', link: `${prefix}/drivers/slack` },
+            { text: 'Microsoft Teams', link: `${prefix}/drivers/teams` },
+            { text: 'Google Chat', link: `${prefix}/drivers/googlechat` },
+            { text: 'Mattermost', link: `${prefix}/drivers/mattermost` },
+            { text: 'VoceChat', link: `${prefix}/drivers/vocechat` },
+            { text: 'Rocket.Chat', link: `${prefix}/drivers/rocketchat` },
+            { text: 'Webhook', link: `${prefix}/drivers/webhook` },
+          ]
+        : [
+            { text: 'Overview', link: `${prefix}/drivers/` },
+            { text: 'NapCat (QQ)', link: `${prefix}/drivers/napcat` },
+            { text: 'Discord', link: `${prefix}/drivers/discord` },
+            { text: 'Telegram', link: `${prefix}/drivers/telegram` },
+            { text: 'Feishu / Lark', link: `${prefix}/drivers/feishu` },
+            { text: 'DingTalk', link: `${prefix}/drivers/dingtalk` },
+            { text: 'Yunhu', link: `${prefix}/drivers/yunhu` },
+            { text: 'KOOK', link: `${prefix}/drivers/kook` },
+            { text: 'Matrix', link: `${prefix}/drivers/matrix` },
+            { text: 'Signal', link: `${prefix}/drivers/signal` },
+            { text: 'Slack', link: `${prefix}/drivers/slack` },
+            { text: 'Microsoft Teams', link: `${prefix}/drivers/teams` },
+            { text: 'Google Chat', link: `${prefix}/drivers/googlechat` },
+            { text: 'Mattermost', link: `${prefix}/drivers/mattermost` },
+            { text: 'VoceChat', link: `${prefix}/drivers/vocechat` },
+            { text: 'Rocket.Chat', link: `${prefix}/drivers/rocketchat` },
+            { text: 'Webhook', link: `${prefix}/drivers/webhook` },
+          ],
+    },
+  ]
+}
+
+function zhSidebar(version: string) {
+  const prefix = `/zh/${version}`
+  return [
+    {
+      text: '指南',
+      items: [
+        { text: '快速开始', link: `${prefix}/getting-started` },
+        { text: '配置文件', link: `${prefix}/configuration` },
+        { text: '规则配置', link: `${prefix}/rules` },
+        { text: '用户指令', link: `${prefix}/user-commands` },
+        { text: '平台支持状态', link: `${prefix}/platform-support` },
+      ],
+    },
+    {
+      text: '驱动器',
+      items: version === 'v0.4'
+        ? [
+            { text: '概览', link: `${prefix}/drivers/` },
+            { text: 'QQ', link: `${prefix}/drivers/qq` },
+            { text: 'Discord', link: `${prefix}/drivers/discord` },
+            { text: 'Telegram', link: `${prefix}/drivers/telegram` },
+            { text: '飞书 / Lark', link: `${prefix}/drivers/feishu` },
+            { text: '钉钉', link: `${prefix}/drivers/dingtalk` },
+            { text: '云湖', link: `${prefix}/drivers/yunhu` },
+            { text: 'KOOK', link: `${prefix}/drivers/kook` },
+            { text: 'Matrix', link: `${prefix}/drivers/matrix` },
+            { text: 'Signal', link: `${prefix}/drivers/signal` },
+            { text: 'Slack', link: `${prefix}/drivers/slack` },
+            { text: 'Microsoft Teams', link: `${prefix}/drivers/teams` },
+            { text: 'Google Chat', link: `${prefix}/drivers/googlechat` },
+            { text: 'Mattermost', link: `${prefix}/drivers/mattermost` },
+            { text: 'VoceChat', link: `${prefix}/drivers/vocechat` },
+            { text: 'Rocket.Chat', link: `${prefix}/drivers/rocketchat` },
+            { text: 'Webhook', link: `${prefix}/drivers/webhook` },
+          ]
+        : [
+            { text: '概览', link: `${prefix}/drivers/` },
+            { text: 'NapCat (QQ)', link: `${prefix}/drivers/napcat` },
+            { text: 'Discord', link: `${prefix}/drivers/discord` },
+            { text: 'Telegram', link: `${prefix}/drivers/telegram` },
+            { text: '飞书 / Lark', link: `${prefix}/drivers/feishu` },
+            { text: '钉钉', link: `${prefix}/drivers/dingtalk` },
+            { text: '云湖', link: `${prefix}/drivers/yunhu` },
+            { text: 'KOOK', link: `${prefix}/drivers/kook` },
+            { text: 'Matrix', link: `${prefix}/drivers/matrix` },
+            { text: 'Signal', link: `${prefix}/drivers/signal` },
+            { text: 'Slack', link: `${prefix}/drivers/slack` },
+            { text: 'Microsoft Teams', link: `${prefix}/drivers/teams` },
+            { text: 'Google Chat', link: `${prefix}/drivers/googlechat` },
+            { text: 'Mattermost', link: `${prefix}/drivers/mattermost` },
+            { text: 'VoceChat', link: `${prefix}/drivers/vocechat` },
+            { text: 'Rocket.Chat', link: `${prefix}/drivers/rocketchat` },
+            { text: 'Webhook', link: `${prefix}/drivers/webhook` },
+          ],
+    },
+  ]
+}
+
+function versionNav(langPrefix: string) {
+  return VERSIONS.map((v) => ({
+    text: v === CURRENT_VERSION ? `${v} (latest)` : v,
+    link: `/${langPrefix}/${v}/getting-started`,
+  }))
+}
 
 export default defineConfig({
   title: 'NextBridge',
   lastUpdated: true,
+  cleanUrls: true,
   sitemap: {
     hostname: "https://nextbridge.siiway.org",
   },
@@ -96,10 +153,11 @@ export default defineConfig({
       description: 'The chat bridge that links up all the major chat platforms!',
       themeConfig: {
         nav: [
-          { text: 'Guide', link: '/getting-started' },
-          { text: 'Drivers', link: '/drivers/' },
+          { text: 'Guide', link: `/en/${CURRENT_VERSION}/getting-started` },
+          { text: 'Drivers', link: `/en/${CURRENT_VERSION}/drivers/` },
+          { text: CURRENT_VERSION, items: versionNav('en') },
         ],
-        sidebar: enSidebar,
+        sidebar: enSidebar(CURRENT_VERSION),
         editLink: {
           pattern: "https://github.com/siiway/NextBridge/edit/main/docs/:path",
           text: "Edit this page on GitHub",
@@ -115,10 +173,11 @@ export default defineConfig({
       description: '连接几乎所有主流聊天平台的聊天桥接工具！',
       themeConfig: {
         nav: [
-          { text: '指南', link: '/zh/getting-started' },
-          { text: '驱动器', link: '/zh/drivers/' },
+          { text: '指南', link: `/zh/${CURRENT_VERSION}/getting-started` },
+          { text: '驱动器', link: `/zh/${CURRENT_VERSION}/drivers/` },
+          { text: CURRENT_VERSION, items: versionNav('zh') },
         ],
-        sidebar: zhSidebar,
+        sidebar: zhSidebar(CURRENT_VERSION),
         editLink: {
           pattern: "https://github.com/siiway/NextBridge/edit/main/docs/:path",
           text: "在 GitHub 上编辑本页",
@@ -126,11 +185,9 @@ export default defineConfig({
         lastUpdated: {
           text: '本页最后更新于',
         },
-        // 汉化了"On this page"
         outline: {
           label: '本页目录'
         },
-        // 汉化了 "Previous page" 与 "Next page"。
         docFooter: {
           prev: '上一篇',
           next: '下一篇'
@@ -149,12 +206,11 @@ export default defineConfig({
       alt: "NextBridge",
     },
 
-    // 搜索功能 https://vitepress.dev/zh/reference/default-theme-search
     search: {
       provider: 'local',
       options: {
         locales: {
-          '/zh/': { // 此处为翻译的语言
+          '/zh/': {
             translations: {
               button: {
                 buttonText: '搜索',

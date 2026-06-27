@@ -26,13 +26,15 @@ features:
     link: /en/v0.4/rules
     linkText: Learn more about rules
   - title: Media bridging
-    details: Images, videos, voice messages, and files are automatically downloaded and re-uploaded to the target platform.
+    details: Images, videos, voice messages, and files are automatically downloaded and re-uploaded to the target platform. Configurable per-instance size limits.
+  - title: Per-channel message formatting
+    details: Customize the message format for each target platform independently. Discord webhooks and Telegram richheader get native username and avatar; QQ gets clean text prefixes.
   - title: User Commands
-    details: Users can bind their accounts across platforms with /bind and /confirm.
+    details: Users can bind their accounts across platforms with /bind and /confirm to ensure perfect cross-platform mentions and notifications.
     link: /en/v0.4/user-commands
     linkText: View user commands
   - title: JSON, YAML, and TOML config
-    details: Write your config in whichever format you prefer.
+    details: Write your config in whichever format you prefer. Convert between formats at any time with the built-in convert command.
     link: /en/v0.4/configuration
     linkText: Configure NextBridge
 ---

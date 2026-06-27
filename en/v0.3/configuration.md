@@ -294,4 +294,4 @@ matrix:
     password: your_password
 ```
 
-For per-driver config keys, see the individual driver pages in the [Drivers](/drivers/) section.
+For per-driver config keys, see the individual driver pages in the [Drivers](./drivers/) section.

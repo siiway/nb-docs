@@ -294,4 +294,4 @@ matrix:
     password: your_password
 ```
 
-各平台的详细配置项，请参阅[驱动器](/zh/drivers/)章节中对应的驱动器页面。
+各平台的详细配置项，请参阅[驱动器](./drivers/)章节中对应的驱动器页面。

@@ -34,7 +34,7 @@ Declare each platform instance with its credentials. Every key under a platform 
 
 ```json
 {
-  "napcat": {
+  "qq": {
     "my_qq": {
       "ws_url": "ws://127.0.0.1:3001",
       "ws_token": "your_token"
@@ -55,7 +55,7 @@ Declare each platform instance with its credentials. Every key under a platform 
 }
 ```
 
-See the [Drivers](/drivers/) section for every config key each platform supports.
+See the [Drivers](./drivers/) section for every config key each platform supports.
 
 ### data/rules.json
 
@@ -79,7 +79,7 @@ Define how messages flow between instances. The simplest setup uses a **connect*
 }
 ```
 
-See [Rules](/rules) for the full reference.
+See [Rules](./rules) for the full reference.
 
 ## Run
 

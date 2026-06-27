@@ -34,7 +34,7 @@ NextBridge 从 `data/` 目录读取两个 JSON 配置文件。
 
 ```json
 {
-  "napcat": {
+  "qq": {
     "我的QQ": {
       "ws_url": "ws://127.0.0.1:3001",
       "ws_token": "your_token"
@@ -55,7 +55,7 @@ NextBridge 从 `data/` 目录读取两个 JSON 配置文件。
 }
 ```
 
-每个平台支持的配置项请参阅[驱动器](/zh/drivers/)章节。
+每个平台支持的配置项请参阅[驱动器](./drivers/)章节。
 
 ### data/rules.json
 
@@ -79,7 +79,7 @@ NextBridge 从 `data/` 目录读取两个 JSON 配置文件。
 }
 ```
 
-完整说明请参阅[规则配置](/zh/rules)。
+完整说明请参阅[规则配置](./rules)。
 
 ## 运行
 

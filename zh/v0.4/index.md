@@ -26,13 +26,15 @@ features:
     link: /zh/v0.4/rules
     linkText: 了解规则详情
   - title: 媒体桥接
-    details: 图片、视频、语音消息和文件会自动下载并重新上传到目标平台。
+    details: 图片、视频、语音消息和文件会自动下载并重新上传到目标平台。支持按实例配置文件大小上限。
+  - title: 按频道定制消息格式
+    details: 为每个目标平台独立设置消息格式。Discord Webhook 和 Telegram richheader 支持原生用户名和头像显示，QQ 使用简洁的文字前缀。
   - title: 用户指令
-    details: 用户可通过 /bind 和 /confirm 跨平台绑定账号。
+    details: 用户可通过 /bind 和 /confirm 跨平台绑定账号，确保完美的跨平台提及和通知。
     link: /zh/v0.4/user-commands
     linkText: 查看用户指令
   - title: JSON、YAML 和 TOML 配置
-    details: 使用你偏好的格式编写配置文件。
+    details: 使用你偏好的格式编写配置文件，可随时通过内置 convert 命令互转。
     link: /zh/v0.4/configuration
     linkText: 配置 NextBridge
 ---
