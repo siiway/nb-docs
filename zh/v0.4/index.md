@@ -37,4 +37,6 @@ features:
     details: 使用你偏好的格式编写配置文件，可随时通过内置 convert 命令互转。
     link: /zh/v0.4/configuration
     linkText: 配置 NextBridge
+  - title: 消息编辑同步
+    details: 在 Discord 或 Telegram 编辑消息后，会自动同步更新其他平台上的对应桥接消息。Discord 支持 Webhook 和 Bot 两种编辑方式，Telegram 在编辑时会保留富头部卡片样式。
 ---

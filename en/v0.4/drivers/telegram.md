@@ -132,6 +132,14 @@ When `avatar_proxy_host` is configured, NextBridge uses a Cloudflare Worker to p
 |---|---|
 | `avatar_proxy_host` is not set | Avatar URLs are not included in messages |
 
+## Message Edit Sync
+
+When a Telegram message is edited, NextBridge detects the change and updates the corresponding bridged messages on other platforms.
+
+Edits from other platforms are applied to Telegram using `edit_message_text`. If the message was originally sent with a rich-header link preview, the preview is reconstructed from the same `rich_header_host` URL during the edit. If `rich_header_host` is not set, a bold/italic HTML header is used as fallback.
+
+Only text content is synced on edit. Media attachments cannot be replaced via the Telegram Bot API.
+
 ## Notes
 
 - Telegram bots cannot initiate conversations with users. Make sure the bot is already in the target group before running NextBridge.

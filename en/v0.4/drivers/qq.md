@@ -32,6 +32,8 @@ Add under `qq.<instance_id>` in `config.json`:
 | `forward_render_asset_ttl_seconds` | No | `1209600` (14 days) | TTL for cached forward page images/assets |
 | `forward_render_base_url` | No | — | Custom public URL prefix for forward page links. When set, links are generated as `{base_url}/{page_id}` (mount path is NOT appended automatically) |
 | `forward_render_cqface_gif` | No | `true` | Forward face rendering strategy: `false` (unicode emoji), `true` (default gif host), or a custom URL string for the gif host base |
+| `edit_via_reply` | No | `true` | When another platform edits a bridged message, simulate the edit on QQ by sending a new message that quotes the original and prepends `edit_prefix`. Set to `false` to ignore incoming edits entirely. |
+| `edit_prefix` | No | `"[编辑]"` | Prefix prepended to the simulated edit message so it is distinguishable from a normal message. Only used when `edit_via_reply` is `true`. |
 | `proxy` | No | — | Proxy URL for WebSocket connection and media downloading (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). Set to `null` to explicitly disable proxy for this instance (ignores global proxy setting). |
 | `media_proxy` | No | — | Proxy URL used only when fetching media/attachments. Defaults to following `proxy` when unset. |
 
@@ -100,6 +102,15 @@ When `forward_render_enabled` is `true`, QQ combined-forward messages are render
 - **Page settings**: The forward page includes a top-right settings button for color mode and forward display mode, remembered in LocalStorage.
 - **Unreliable sender IDs**: When the OneBot backend cannot reliably map a sender ID inside a combined-forward batch, NextBridge labels the UID as unreliable in the rendered page.
 - **Per-rule TTL override**: `forward_render_ttl_seconds` can be overridden per-rule via the `msg` config in rules.
+
+## Message Edit Sync
+
+QQ (OneBot 11) has **no native "edit message" API**, so an edit made on another platform (Discord/Telegram) cannot be applied to the original QQ message in place. Instead, NextBridge **simulates** the edit:
+
+- When an edit is bridged to QQ, NextBridge sends a **new message** that **quotes (replies to)** the original bridged message and prepends `edit_prefix` (default `[编辑]`).
+- Repeated edits always quote the **original** bridged message, so the edit thread stays anchored to it.
+- Only text content is synced. Attachments are not re-sent on edit.
+- Set `edit_via_reply` to `false` to disable this behavior and ignore incoming edits.
 
 ## Notes
 

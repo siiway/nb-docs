@@ -37,4 +37,6 @@ features:
     details: Write your config in whichever format you prefer. Convert between formats at any time with the built-in convert command.
     link: /en/v0.4/configuration
     linkText: Configure NextBridge
+  - title: Message Edit Sync
+    details: Edits made on Discord or Telegram are automatically synced to bridged messages on the other platform. Discord supports both webhook and bot edit modes; Telegram preserves the rich-header card on edit.
 ---

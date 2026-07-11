@@ -110,6 +110,20 @@ When using NapCat's `cqface_mode: "emoji"`, the Discord driver resolves `:cqface
 
 If the file is absent or an emoji is not found, the token falls back to the plain `:cqface<id>:` text.
 
+## Message Edit Sync
+
+When a Discord message is edited, NextBridge detects the change and updates the corresponding bridged messages on other platforms.
+
+**Requirements:**
+- `bot_token` must be configured to receive edit events from Discord.
+- Webhook-only mode (no `bot_token`) cannot receive edit events; edits from other platforms can still be applied to Discord.
+
+**How edits are applied to Discord:**
+- If `webhook_url` is configured for the channel, NextBridge uses the Discord webhook edit API (`PATCH /webhooks/{id}/{token}/messages/{message_id}`).
+- Otherwise, if `bot_token` is available, the bot fetches and edits the message directly.
+
+Only text content is synced on edit. Attachments are not modified.
+
 ## Notes
 
 - Bot messages are automatically ignored (webhook echoes are not re-bridged). Mass mentions (`@everyone`/`@here`) are sanitized by default.

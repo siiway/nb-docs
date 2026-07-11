@@ -132,6 +132,14 @@ Telegram 驱动器使用 [python-telegram-bot](https://python-telegram-bot.org/)
 |---|---|
 | 未配置 `avatar_proxy_host` | 消息中不包含头像 URL |
 
+## 消息编辑同步
+
+当 Telegram 消息被编辑后，NextBridge 会检测到变更，并自动更新其他平台上对应的桥接消息。
+
+其他平台的编辑会通过 `edit_message_text` 应用到 Telegram。若原始消息是通过富头部链接预览发送的，编辑时会使用相同的 `rich_header_host` URL 重新构建预览卡片。若未配置 `rich_header_host`，则回退为加粗/斜体 HTML 头部。
+
+编辑同步仅同步文本内容。Telegram Bot API 不支持替换已发送消息的媒体附件。
+
 ## 注意事项
 
 - Telegram Bot 无法主动发起对话，请确保在运行 NextBridge 前 Bot 已在目标群组中。

@@ -110,6 +110,20 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
 
 若文件不存在或未找到对应 Emoji，将回退为纯文本 `:cqface<id>:`。
 
+## 消息编辑同步
+
+当 Discord 消息被编辑后，NextBridge 会检测到变更，并自动更新其他平台上对应的桥接消息。
+
+**前提条件：**
+- 必须配置 `bot_token` 才能从 Discord 接收编辑事件。
+- 纯 Webhook 模式（无 `bot_token`）无法接收来自 Discord 的编辑事件，但仍可将其他平台的编辑同步应用至 Discord。
+
+**编辑如何应用到 Discord：**
+- 如果频道配置了 `webhook_url`，NextBridge 使用 Discord Webhook 编辑 API（`PATCH /webhooks/{id}/{token}/messages/{message_id}`）。
+- 否则，如果配置了 `bot_token`，Bot 会直接获取并编辑对应消息。
+
+编辑同步仅同步文本内容，不修改附件。
+
 ## 注意事项
 
 - Bot 发送的消息不会被再次桥接（Webhook 回显不会触发事件）。

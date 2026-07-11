@@ -4,7 +4,7 @@
 
 | Platform                    | Status | Receive | Send | Mentions | Replies | Media | Custom Proxy | Notes                                                                   |
 | :-------------------------- | :----- | :------ | :--- | :------- | :------ | :---- | :----------- | :---------------------------------------------------------------------- |
-| **Tencent QQ**                | ✅      | ✅       | ✅    | ✅        | ✅       | ✅     | ✅            | Supports multiple protocol backends: NapCat, Lagrange, OneBot v11       |
+| **Tencent QQ**                | ✅      | ✅       | ✅    | ✅        | ✅       | ✅     | ✅            | Supports multiple protocol backends: NapCat, Lagrange, OneBot v11; incoming edits simulated via quote + prefix |
 | **Discord**                 | ✅      | ✅       | ✅    | ✅        | ℹ️      | ✅     | ✅            | Webhook cannot specify reply target; reply bridging requires bot path   |
 | **Telegram**                | ✅      | ✅       | ✅    | ✅        | ✅       | ⚠️    | ✅            | Uses long polling                                                       |
 | **Feishu / Lark**           | ✅      | ✅       | ✅    | ⚠️       | ⚠️      | ❌     | ❌            | Webhook / WebSocket receive; IM API send; **SDK doesn't support proxy** |

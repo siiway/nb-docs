@@ -32,6 +32,8 @@ NextBridge 通过 OneBot 11 WebSocket 协议连接 QQ。支持多种协议后端
 | `forward_render_asset_ttl_seconds` | 否 | `1209600`（14 天） | 合并转发页面缓存图片/资源的 TTL |
 | `forward_render_base_url` | 否 | — | 合并转发页面链接的自定义公共 URL 前缀。设置后链接格式为 `{base_url}/{page_id}`（不会自动追加挂载路径） |
 | `forward_render_cqface_gif` | 否 | `true` | 合并转发表情渲染策略：`false`（unicode 表情）、`true`（默认 gif 主机）或自定义 gif 主机基础 URL 字符串 |
+| `edit_via_reply` | 否 | `true` | 当其他平台编辑了已桥接的消息时，通过发送一条引用原始消息并添加 `edit_prefix` 前缀的新消息来在 QQ 上模拟编辑。设为 `false` 可完全忽略收到的编辑。 |
+| `edit_prefix` | 否 | `"[编辑]"` | 添加到模拟编辑消息前的前缀，用于与普通消息区分。仅在 `edit_via_reply` 为 `true` 时生效。 |
 | `proxy` | 否 | — | 用于 WebSocket 连接和附件下载的代理 URL（例如：`http://proxy.example.com:8080` 或 `socks5://proxy.example.com:1080`）。设置为 `null` 可显式禁用此实例的代理（忽略全局代理设置）。 |
 | `media_proxy` | 否 | — | 仅用于获取媒体/附件的代理 URL。未设置时默认跟随 `proxy`。 |
 
@@ -100,6 +102,15 @@ NextBridge 默认桥接**群消息**。通过指定 `user_id`（而非 `group_id
 - **页面设置**：合并转发页面右上角提供设置入口，可切换颜色模式与合并转发显示方式，并使用 LocalStorage 记忆。
 - **不可靠 UID 标记**：当 OneBot 后端在同一批合并转发中无法可靠对应发送者 ID 时，页面会把该 UID 标记为不可靠。
 - **按规则覆盖 TTL**：`forward_render_ttl_seconds` 可通过规则中的 `msg` 配置按规则覆盖。
+
+## 消息编辑同步
+
+QQ（OneBot 11）**没有原生的「编辑消息」API**，因此其他平台（Discord/Telegram）上的编辑无法就地应用到 QQ 上的原始消息。NextBridge 转而**模拟**编辑：
+
+- 当编辑被桥接到 QQ 时，NextBridge 会发送一条**新消息**，该消息**引用（回复）**原始桥接消息，并在前面添加 `edit_prefix` 前缀（默认 `[编辑]`）。
+- 重复编辑始终引用**原始**桥接消息，因此编辑始终锚定在原消息上。
+- 仅同步文本内容，编辑时不会重新发送附件。
+- 将 `edit_via_reply` 设为 `false` 可关闭此行为并忽略收到的编辑。
 
 ## 注意事项
 
