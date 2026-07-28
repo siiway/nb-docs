@@ -71,6 +71,7 @@ Media messages may include a caption, which becomes the message text.
 
 | Attachment type | Telegram API method |
 |---|---|
+| `image` (GIF) | `send_animation` (keeps the animation) |
 | `image` | `send_photo` |
 | `voice` | `send_voice` |
 | `video` | `send_video` |
