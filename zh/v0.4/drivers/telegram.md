@@ -23,6 +23,7 @@ Telegram 驱动器使用 [python-telegram-bot](https://python-telegram-bot.org/)
 | `avatar_proxy_host` | 否 | — | Cloudflare 头像代理 Worker 的基础 URL（见 [头像代理](#头像代理)） |
 | `photo_padding_color` | 否 | `"#000000"` | 极端宽高比照片的填充颜色。设为 `null` 禁用填充 |
 | `sanitize_accidental_mentions` | 否 | `true` | 在桥接消息的 `@` 后插入零宽空格，防止意外触发 Telegram 提及 |
+| `enable_recall` | 否 | `true` | 是否启用消息撤回同步。启用后：其他平台的撤回会通过 `delete_message` 应用到 Telegram；同时可回复消息并发送 `/recall` 主动通知撤回。注意：Telegram Bot API **无法自动检测**用户删除消息，故需 `/recall` 命令代替。设为 `false` 可禁用撤回应用与 `/recall` 命令。 |
 | `media_proxy` | 否 | — | 仅用于获取媒体/附件的代理 URL。未设置时默认跟随 `proxy`。 |
 | `proxy` | 否 | — | 所有 Telegram API 请求的代理 URL（例如：`http://proxy.example.com:8080` 或 `socks5://proxy.example.com:1080`）。设置为 `null` 可显式禁用此实例的代理（忽略全局代理设置）。 |
 
@@ -139,6 +140,21 @@ Telegram 驱动器使用 [python-telegram-bot](https://python-telegram-bot.org/)
 其他平台的编辑会通过 `edit_message_text` 应用到 Telegram。若原始消息是通过富头部链接预览发送的，编辑时会使用相同的 `rich_header_host` URL 重新构建预览卡片。若未配置 `rich_header_host`，则回退为加粗/斜体 HTML 头部。
 
 编辑同步仅同步文本内容。Telegram Bot API 不支持替换已发送消息的媒体附件。
+
+## 消息撤回同步
+
+其他平台（Discord/QQ）上的撤回会通过 `delete_message` 应用到 Telegram，删除对应的桥接消息。
+
+**重要限制：** Telegram Bot API **无法检测**用户删除消息——它不会推送任何删除事件。因此普通删除操作**无法**被自动检测或桥接到其他平台。
+
+**`/recall` 命令（撤回通知）：** 作为上述限制的变通方案，可以**回复**想要撤回的消息并发送 `/recall`，主动通知 NextBridge 发生了撤回。NextBridge 会：
+
+- 将撤回桥接到其他平台，删除对应的桥接消息；
+- 尽力删除 Telegram 上的原始消息以及该 `/recall` 命令消息本身（需要 Bot 具备删除权限，通常要求在群内为管理员，且消息在可删除的时间范围内）。
+
+若未回复任何消息就发送 `/recall`，Bot 会回复用法提示。
+
+将 `enable_recall` 设为 `false` 可禁用将撤回应用到 Telegram，同时也会禁用 `/recall` 命令。
 
 ## 注意事项
 

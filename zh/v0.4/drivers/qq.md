@@ -34,6 +34,7 @@ NextBridge 通过 OneBot 11 WebSocket 协议连接 QQ。支持多种协议后端
 | `forward_render_cqface_gif` | 否 | `true` | 合并转发表情渲染策略：`false`（unicode 表情）、`true`（默认 gif 主机）或自定义 gif 主机基础 URL 字符串 |
 | `edit_via_reply` | 否 | `true` | 当其他平台编辑了已桥接的消息时，通过发送一条引用原始消息并添加 `edit_prefix` 前缀的新消息来在 QQ 上模拟编辑。设为 `false` 可完全忽略收到的编辑。 |
 | `edit_prefix` | 否 | `"[编辑]"` | 添加到模拟编辑消息前的前缀，用于与普通消息区分。仅在 `edit_via_reply` 为 `true` 时生效。 |
+| `enable_recall` | 否 | `true` | 是否同步消息撤回。启用后，QQ 上的撤回会被检测并桥接到其他平台，其他平台的撤回也会通过原生 `delete_msg` API 应用到 QQ。设为 `false` 可完全禁用撤回同步。 |
 | `proxy` | 否 | — | 用于 WebSocket 连接和附件下载的代理 URL（例如：`http://proxy.example.com:8080` 或 `socks5://proxy.example.com:1080`）。设置为 `null` 可显式禁用此实例的代理（忽略全局代理设置）。 |
 | `media_proxy` | 否 | — | 仅用于获取媒体/附件的代理 URL。未设置时默认跟随 `proxy`。 |
 
@@ -111,6 +112,15 @@ QQ（OneBot 11）**没有原生的「编辑消息」API**，因此其他平台�
 - 重复编辑始终引用**原始**桥接消息，因此编辑始终锚定在原消息上。
 - 仅同步文本内容，编辑时不会重新发送附件。
 - 将 `edit_via_reply` 设为 `false` 可关闭此行为并忽略收到的编辑。
+
+## 消息撤回同步
+
+QQ（OneBot 11）**原生支持消息撤回**，因此撤回可以双向同步：
+
+- **检测**：QQ 端撤回消息时，OneBot 后端会推送 `group_recall`（群聊）或 `friend_recall`（私聊）通知事件，NextBridge 据此将撤回桥接到其他平台。
+- **应用**：其他平台（Discord/Telegram）上的撤回会通过原生 `delete_msg` API 应用到 QQ 上对应的桥接消息。
+- 若一条源消息被拆分成多条 QQ 消息，撤回时会一并删除全部对应消息。
+- 将 `enable_recall` 设为 `false` 可完全禁用撤回的检测与应用。
 
 ## 注意事项
 

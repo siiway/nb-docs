@@ -27,6 +27,7 @@ Add under `discord.<instance_id>` in `config.json`:
 | `allow_mentions_users` | No | `true` | Allow `@user` mentions in bridged messages |
 | `allow_mentions_roles` | No | `false` | Allow `@role` mentions in bridged messages |
 | `sanitize_mass_mentions` | No | `true` | Neutralize `@everyone`/`@here` in outgoing message text (replaces with plain text) |
+| `enable_recall` | No | `true` | Whether to sync message recalls. When enabled, deletions on Discord are detected and bridged to other platforms, and recalls from other platforms are applied to Discord. Set to `false` to disable recall sync. |
 | `media_proxy` | No | — | Proxy URL used only when fetching media/attachments. Defaults to following `proxy` when unset. |
 | `proxy` | No | — | Proxy URL for all Discord API requests (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). When set, SSL verification is disabled for the proxy connection. Set to `null` to explicitly disable proxy for this instance (ignores global proxy setting). |
 
@@ -123,6 +124,22 @@ When a Discord message is edited, NextBridge detects the change and updates the 
 - Otherwise, if `bot_token` is available, the bot fetches and edits the message directly.
 
 Only text content is synced on edit. Attachments are not modified.
+
+Edit sync is only triggered when the message's visible content (text or attachments) actually changes. Actions such as **pinning a message** or **an auto-generated link preview (embed)** do not change the text, so they are not mistaken for edits and are not synced to other platforms.
+
+## Message Recall Sync
+
+When a Discord message is deleted, NextBridge detects the deletion and removes the corresponding bridged messages on other platforms.
+
+**Requirements:**
+- `bot_token` must be configured to detect deletions from Discord (detected via the gateway raw delete event, which catches even uncached messages).
+- Webhook-only mode (no `bot_token`) cannot detect deletions on Discord; recalls from other platforms can still be applied to Discord.
+
+**How recalls are applied to Discord:**
+- If `webhook_url` is configured for the channel, NextBridge uses the Discord webhook delete API (`DELETE /webhooks/{id}/{token}/messages/{message_id}`).
+- Otherwise, if `bot_token` is available, the bot fetches and deletes the message directly.
+
+Set `enable_recall` to `false` to disable both detection and application of recalls.
 
 ## Notes
 

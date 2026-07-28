@@ -4,9 +4,9 @@
 
 | Platform                    | Status | Receive | Send | Mentions | Replies | Media | Custom Proxy | Notes                                                                   |
 | :-------------------------- | :----- | :------ | :--- | :------- | :------ | :---- | :----------- | :---------------------------------------------------------------------- |
-| **Tencent QQ**                | ✅      | ✅       | ✅    | ✅        | ✅       | ✅     | ✅            | Supports multiple protocol backends: NapCat, Lagrange, OneBot v11; incoming edits simulated via quote + prefix |
-| **Discord**                 | ✅      | ✅       | ✅    | ✅        | ℹ️      | ✅     | ✅            | Webhook cannot specify reply target; reply bridging requires bot path   |
-| **Telegram**                | ✅      | ✅       | ✅    | ✅        | ✅       | ⚠️    | ✅            | Uses long polling                                                       |
+| **Tencent QQ**                | ✅      | ✅       | ✅    | ✅        | ✅       | ✅     | ✅            | Supports multiple protocol backends: NapCat, Lagrange, OneBot v11; incoming edits simulated via quote + prefix; recalls synced both ways |
+| **Discord**                 | ✅      | ✅       | ✅    | ✅        | ℹ️      | ✅     | ✅            | Webhook cannot specify reply target; reply bridging requires bot path; recall detection requires bot   |
+| **Telegram**                | ✅      | ✅       | ✅    | ✅        | ✅       | ⚠️    | ✅            | Uses long polling; can apply recalls; Bot API cannot detect local deletions, use `/recall` reply to notify |
 | **Feishu / Lark**           | ✅      | ✅       | ✅    | ⚠️       | ⚠️      | ❌     | ❌            | Webhook / WebSocket receive; IM API send; **SDK doesn't support proxy** |
 | **DingTalk**                | ✅      | ✅       | ✅    | ⚠️       | ⚠️      | ✅     | ❌            | Webhook receive; Robot API send; **SDK doesn't support proxy**          |
 | **Yunhu**                   | ✅      | ✅       | ✅    | ❌        | ⚠️      | ✅     | ✅            | Webhook receive; open API send; **native mentions not yet supported**   |

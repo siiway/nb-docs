@@ -34,6 +34,7 @@ Add under `qq.<instance_id>` in `config.json`:
 | `forward_render_cqface_gif` | No | `true` | Forward face rendering strategy: `false` (unicode emoji), `true` (default gif host), or a custom URL string for the gif host base |
 | `edit_via_reply` | No | `true` | When another platform edits a bridged message, simulate the edit on QQ by sending a new message that quotes the original and prepends `edit_prefix`. Set to `false` to ignore incoming edits entirely. |
 | `edit_prefix` | No | `"[编辑]"` | Prefix prepended to the simulated edit message so it is distinguishable from a normal message. Only used when `edit_via_reply` is `true`. |
+| `enable_recall` | No | `true` | Whether to sync message recalls. When enabled, recalls on QQ are detected and bridged to other platforms, and recalls from other platforms are applied to QQ via the native `delete_msg` API. Set to `false` to disable recall sync entirely. |
 | `proxy` | No | — | Proxy URL for WebSocket connection and media downloading (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). Set to `null` to explicitly disable proxy for this instance (ignores global proxy setting). |
 | `media_proxy` | No | — | Proxy URL used only when fetching media/attachments. Defaults to following `proxy` when unset. |
 
@@ -111,6 +112,15 @@ QQ (OneBot 11) has **no native "edit message" API**, so an edit made on another 
 - Repeated edits always quote the **original** bridged message, so the edit thread stays anchored to it.
 - Only text content is synced. Attachments are not re-sent on edit.
 - Set `edit_via_reply` to `false` to disable this behavior and ignore incoming edits.
+
+## Message Recall Sync
+
+QQ (OneBot 11) has **native message recall support**, so recalls can be synced in both directions:
+
+- **Detection**: When a message is recalled on QQ, the OneBot backend pushes a `group_recall` (group) or `friend_recall` (private) notice event, which NextBridge uses to bridge the recall to other platforms.
+- **Application**: Recalls made on other platforms (Discord/Telegram) are applied to the corresponding bridged message on QQ via the native `delete_msg` API.
+- If a source message was split into multiple QQ messages, all corresponding messages are deleted on recall.
+- Set `enable_recall` to `false` to disable both detection and application of recalls.
 
 ## Notes
 

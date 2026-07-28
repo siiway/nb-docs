@@ -23,6 +23,7 @@ Add under `telegram.<instance_id>` in `config.json`:
 | `avatar_proxy_host` | No | — | Base URL of your Cloudflare avatar proxy worker (see [Avatar Proxy](#avatar-proxy)) |
 | `photo_padding_color` | No | `"#000000"` | Padding color for extreme aspect ratio photos. Set to `null` to disable padding |
 | `sanitize_accidental_mentions` | No | `true` | Insert zero-width space after `@` to prevent accidental Telegram mentions in bridged messages |
+| `enable_recall` | No | `true` | Whether to enable message recall sync. When enabled: recalls from other platforms are applied to Telegram via `delete_message`, and you can reply to a message with `/recall` to actively notify a recall. Note: the Telegram Bot API **cannot automatically detect** user deletions, so the `/recall` command is used instead. Set to `false` to disable applying recalls and the `/recall` command. |
 | `media_proxy` | No | — | Proxy URL used only when fetching media/attachments. Defaults to following `proxy` when unset. |
 | `proxy` | No | — | Proxy URL for all Telegram API requests (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). Set to `null` to explicitly disable proxy for this instance (ignores global proxy setting). |
 
@@ -139,6 +140,21 @@ When a Telegram message is edited, NextBridge detects the change and updates the
 Edits from other platforms are applied to Telegram using `edit_message_text`. If the message was originally sent with a rich-header link preview, the preview is reconstructed from the same `rich_header_host` URL during the edit. If `rich_header_host` is not set, a bold/italic HTML header is used as fallback.
 
 Only text content is synced on edit. Media attachments cannot be replaced via the Telegram Bot API.
+
+## Message Recall Sync
+
+Recalls made on other platforms (Discord/QQ) are applied to Telegram via `delete_message`, removing the corresponding bridged message.
+
+**Important limitation:** The Telegram Bot API **cannot detect** user message deletions — it pushes no deletion update. Therefore ordinary deletions **cannot** be detected automatically or bridged to other platforms.
+
+**`/recall` command (recall notification):** As a workaround for the limitation above, **reply** to the message you want to recall and send `/recall` to actively notify NextBridge that a recall happened. NextBridge will:
+
+- Bridge the recall to other platforms, deleting the corresponding bridged messages;
+- Best-effort delete the original message on Telegram as well as the `/recall` command message itself (requires the bot to have delete permission — typically admin in the group — and the message to be within the deletable time window).
+
+If `/recall` is sent without replying to a message, the bot replies with a usage hint.
+
+Set `enable_recall` to `false` to disable applying recalls to Telegram, which also disables the `/recall` command.
 
 ## Notes
 

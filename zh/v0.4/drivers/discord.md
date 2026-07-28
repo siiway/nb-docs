@@ -27,6 +27,7 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
 | `allow_mentions_users` | 否 | `true` | 允许桥接消息中的 `@user` 提及 |
 | `allow_mentions_roles` | 否 | `false` | 允许桥接消息中的 `@role` 提及 |
 | `sanitize_mass_mentions` | 否 | `true` | 中和传出消息文本中的 `@everyone`/`@here`（替换为纯文本） |
+| `enable_recall` | 否 | `true` | 是否同步消息撤回。启用后，Discord 上的删除会被检测并桥接到其他平台，其他平台的撤回也会应用到 Discord。设为 `false` 可禁用撤回同步。 |
 | `media_proxy` | 否 | — | 仅用于获取媒体/附件的代理 URL。未设置时默认跟随 `proxy`。 |
 | `proxy` | 否 | — | 所有 Discord API 请求的代理 URL（例如：`http://proxy.example.com:8080` 或 `socks5://proxy.example.com:1080`）。设置后，代理连接将禁用 SSL 验证。设置为 `null` 可显式禁用此实例的代理（忽略全局代理设置）。 |
 
@@ -123,6 +124,22 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
 - 否则，如果配置了 `bot_token`，Bot 会直接获取并编辑对应消息。
 
 编辑同步仅同步文本内容，不修改附件。
+
+仅当消息的可见内容（文本或附件）确实发生变化时才会触发编辑同步。诸如**标注（置顶）消息**、或**消息中的链接自动生成预览（Embed）**等操作不会改变文本内容，因此不会被误判为编辑同步到其他平台。
+
+## 消息撤回同步
+
+当 Discord 消息被删除后，NextBridge 会检测到该操作，并自动删除其他平台上对应的桥接消息。
+
+**前提条件：**
+- 必须配置 `bot_token` 才能从 Discord 接收删除事件（通过网关的原始删除事件检测，即使消息未缓存也可捕获）。
+- 纯 Webhook 模式（无 `bot_token`）无法检测 Discord 上的删除，但仍可将其他平台的撤回应用至 Discord。
+
+**撤回如何应用到 Discord：**
+- 如果频道配置了 `webhook_url`，NextBridge 使用 Discord Webhook 删除 API（`DELETE /webhooks/{id}/{token}/messages/{message_id}`）。
+- 否则，如果配置了 `bot_token`，Bot 会直接获取并删除对应消息。
+
+将 `enable_recall` 设为 `false` 可禁用撤回的检测与应用。
 
 ## 注意事项
 
