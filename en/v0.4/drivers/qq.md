@@ -21,7 +21,7 @@ Add under `qq.<instance_id>` in `config.json`:
 | `ws_token` | No | — | Access token (appended as `?access_token=...`) |
 | `ws_ssl_verify` | No | `true` | Whether to verify TLS certificates for WSS connections. Set to `false` for self-signed certs |
 | `max_file_size` | No | `10485760` (10 MB) | Maximum bytes to download per attachment when sending |
-| `cqface_mode` | No | `"gif"` | How to represent QQ face/emoji segments. `"gif"` uploads the face as an animated GIF (from the local `db/cqface-gif/` database); `"emoji"` renders it as inline text, e.g. `:cqface306:`. |
+| `cqface_mode` | No | `"gif"` | How to represent QQ face/emoji segments. `"gif"` uploads the face as an animated GIF (preferring the local `db/cqface-gif/` database, and falling back to a remote host download when a face is missing locally — see `forward_render_cqface_gif`); `"emoji"` renders it as inline text, e.g. `:cqface306:`. |
 | `file_send_mode` | No | `"stream"` | How to upload files and videos to QQ. `"stream"` uses chunked `upload_file_stream` (recommended for large files); `"base64"` encodes the whole payload and passes it directly to `upload_group_file`. |
 | `stream_threshold` | No | `0` (disabled) | If greater than 0, automatically switches to `"stream"` mode when a file or video exceeds this many bytes, regardless of `file_send_mode`. |
 | `forward_render_enabled` | No | `false` | Enable QQ combined-forward message rendering as HTML pages |
@@ -31,7 +31,7 @@ Add under `qq.<instance_id>` in `config.json`:
 | `forward_render_image_method` | No | `"url"` | Image rendering method for forward pages: `"url"` (serve via DB+bridge URL) or `"base64"` (inline data URI) |
 | `forward_render_asset_ttl_seconds` | No | `1209600` (14 days) | TTL for cached forward page images/assets |
 | `forward_render_base_url` | No | — | Custom public URL prefix for forward page links. When set, links are generated as `{base_url}/{page_id}` (mount path is NOT appended automatically) |
-| `forward_render_cqface_gif` | No | `true` | Forward face rendering strategy: `false` (unicode emoji), `true` (default gif host), or a custom URL string for the gif host base |
+| `forward_render_cqface_gif` | No | `true` | Face GIF host strategy: `false` (no remote gif; forward rendering falls back to unicode emoji), `true` (default gif host), or a custom URL string for the gif host base. Also used as the remote fallback source for the main message path under `cqface_mode: "gif"` when a face is missing from the local database. |
 | `edit_via_reply` | No | `true` | When another platform edits a bridged message, simulate the edit on QQ by sending a new message that quotes the original and prepends `edit_prefix`. Set to `false` to ignore incoming edits entirely. |
 | `edit_prefix` | No | `"[编辑]"` | Prefix prepended to the simulated edit message so it is distinguishable from a normal message. Only used when `edit_via_reply` is `true`. |
 | `enable_recall` | No | `true` | Whether to sync message recalls. When enabled, recalls on QQ are detected and bridged to other platforms, and recalls from other platforms are applied to QQ via the native `delete_msg` API. Set to `false` to disable recall sync entirely. |
@@ -82,7 +82,8 @@ Incoming messages are parsed from OneBot 11 segment arrays:
 | `record` | Forwarded as `voice` attachment |
 | `video` | Forwarded as `video` attachment |
 | `file` | Forwarded as `file` attachment |
-| Others (face, reply, forward...) | Silently skipped |
+| `face` | Depends on `cqface_mode`: `"gif"` forwards it as a GIF `image` attachment (downloaded from the remote host when missing locally); `"emoji"` becomes `:cqfaceNNN:` inline text |
+| Others (reply, forward...) | Silently skipped |
 
 ## Sending
 

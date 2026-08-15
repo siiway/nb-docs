@@ -178,6 +178,9 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
 | `database.pool_size` | 否 | — | 非 SQLite 数据库的连接池大小。未指定时使用 SQLAlchemy 默认值。 |
 | `database.max_overflow` | 否 | — | 非 SQLite 数据库的连接池最大溢出大小。未指定时使用 SQLAlchemy 默认值。 |
 | `database.pool_recycle` | 否 | `3600` | 连接回收时间（秒），默认为 1 小时。 |
+| `database.sslmode` | 否 | — | PostgreSQL SSL 模式（如 `require`、`prefer`、`disable`）。仅适用于 PostgreSQL。 |
+| `database.connect_timeout` | 否 | — | PostgreSQL 连接超时（秒）。仅适用于 PostgreSQL。 |
+| `database.application_name` | 否 | — | PostgreSQL 应用名称，用于连接标识。仅适用于 PostgreSQL。 |
 
 ### 数据库 URL 示例
 
@@ -214,7 +217,10 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
       "url": "postgresql://user:password@localhost:5432/nextbridge",
       "pool_size": 10,
       "max_overflow": 20,
-      "pool_recycle": 3600
+      "pool_recycle": 3600,
+      "sslmode": "require",
+      "connect_timeout": 10,
+      "application_name": "nextbridge"
     }
   }
 }
@@ -253,21 +259,46 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
 
 ## 插件配置
 
-控制驱动器插件的发现和生命周期管理。
+控制驱动器与通用插件的发现、生命周期管理和每个插件的独立设置。
+
+### 驱动器选择
 
 | 键 | 是否必填 | 默认值 | 说明 |
 |---|---|---|---|
-| `plugins.paths` | 否 | `[]` | 扫描驱动器插件 `.py` 文件的本地目录列表 |
+| `plugins.drivers.enabled` | 否 | `[]` | 要加载的驱动器名称。空列表 = 从配置文件键自动发现 |
+| `plugins.drivers.external` | `dict` | `{}` | 外部驱动器导入，按名称键值 |
+
+### 通用插件
+
+| 键 | 是否必填 | 默认值 | 说明 |
+|---|---|---|---|
+| `plugins.general.enabled` | 否 | `[]` | 要启用的插件名称 |
+| `plugins.general.external` | 否 | `{}` | 外部插件模块，按名称键值 |
+| `plugins.config` | 否 | `{}` | 按插件名称键值的配置 |
+
+### 路径与生命周期
+
+| 键 | 是否必填 | 默认值 | 说明 |
+|---|---|---|---|
+| `plugins.paths` | 否 | `[]` | 扫描驱动器/插件 `.py` 文件的本地目录列表 |
 | `plugins.auto_restart` | 否 | `true` | 崩溃的驱动器自动重启（指数退避） |
 | `plugins.max_restart_attempts` | 否 | `5` | 崩溃驱动器放弃重启前的最大重试次数 |
 | `plugins.health_check_interval` | 否 | `60` | 定期驱动器健康检查间隔（秒）。设为 `0` 禁用 |
-| `plugins.admin.enable` | 否 | `false` | 启用管理 API 端点（`/_nextbridge/drivers`、`/_nextbridge/admin/reload/{id}`）。需同时设置 `password` |
+| `plugins.admin.enable` | 否 | `false` | 启用管理 API 端点（`/_nextbridge/drivers`、`/_nextbridge/plugins`、`/_nextbridge/admin/reload/{id}`）。需同时设置 `password` |
 | `plugins.admin.password` | 否 | `""` | 管理 API 访问密码（HTTP Basic Auth）。`admin.enable` 为 `true` 时必填 |
 
 ```json
 {
   "global": {
     "plugins": {
+      "general": {
+        "enabled": ["stats"]
+      },
+      "config": {
+        "stats": {
+          "interval": 300
+        }
+      },
       "auto_restart": true,
       "max_restart_attempts": 5,
       "admin": {

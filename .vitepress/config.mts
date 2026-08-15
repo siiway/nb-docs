@@ -58,6 +58,12 @@ function enSidebar(version: string) {
             { text: 'Webhook', link: `${prefix}/drivers/webhook` },
           ],
     },
+    {
+      text: 'Extending',
+      items: [
+        { text: 'Plugin Development', link: `${prefix}/plugins` },
+      ],
+    },
   ]
 }
 
@@ -115,6 +121,12 @@ function zhSidebar(version: string) {
             { text: 'Rocket.Chat', link: `${prefix}/drivers/rocketchat` },
             { text: 'Webhook', link: `${prefix}/drivers/webhook` },
           ],
+    },
+    {
+      text: '扩展',
+      items: [
+        { text: '插件开发', link: `${prefix}/plugins` },
+      ],
     },
   ]
 }

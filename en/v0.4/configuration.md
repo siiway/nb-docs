@@ -178,6 +178,9 @@ NextBridge uses SQLAlchemy for database operations, which supports multiple data
 | `database.pool_size` | No | — | Connection pool size for non-SQLite databases. Uses SQLAlchemy default if not specified. |
 | `database.max_overflow` | No | — | Maximum overflow size of the pool for non-SQLite databases. Uses SQLAlchemy default if not specified. |
 | `database.pool_recycle` | No | `3600` | Recycle connections after this many seconds (default: 1 hour). |
+| `database.sslmode` | No | — | PostgreSQL SSL mode (e.g., `require`, `prefer`, `disable`). Only applies to PostgreSQL. |
+| `database.connect_timeout` | No | — | PostgreSQL connection timeout in seconds. Only applies to PostgreSQL. |
+| `database.application_name` | No | — | PostgreSQL application name for connection identification. Only applies to PostgreSQL. |
 
 ### Database URL Examples
 
@@ -214,7 +217,10 @@ NextBridge uses SQLAlchemy for database operations, which supports multiple data
       "url": "postgresql://user:password@localhost:5432/nextbridge",
       "pool_size": 10,
       "max_overflow": 20,
-      "pool_recycle": 3600
+      "pool_recycle": 3600,
+      "sslmode": "require",
+      "connect_timeout": 10,
+      "application_name": "nextbridge"
     }
   }
 }
@@ -253,21 +259,46 @@ Several drivers (DingTalk, Feishu, VoceChat, Yunhu, etc.) receive messages via H
 
 ## Plugin Configuration
 
-Controls driver plugin discovery and lifecycle management.
+Controls driver and general plugin discovery, lifecycle management, and per-plugin settings.
+
+### Driver Selection
 
 | Key | Required | Default | Description |
 |---|---|---|---|
-| `plugins.paths` | No | `[]` | Local directories to scan for driver plugin `.py` files |
+| `plugins.drivers.enabled` | No | `[]` | Driver names to load. Empty = auto-discover from config file keys |
+| `plugins.drivers.external` | `dict` | `{}` | External driver imports, keyed by driver name |
+
+### General Plugins
+
+| Key | Required | Default | Description |
+|---|---|---|---|
+| `plugins.general.enabled` | No | `[]` | Plugin names to enable |
+| `plugins.general.external` | No | `{}` | External plugin modules, keyed by name |
+| `plugins.config` | No | `{}` | Per-plugin configuration, keyed by plugin name |
+
+### Paths & Lifecycle
+
+| Key | Required | Default | Description |
+|---|---|---|---|
+| `plugins.paths` | No | `[]` | Local directories to scan for driver/plugin `.py` files |
 | `plugins.auto_restart` | No | `true` | Automatically restart crashed drivers with exponential backoff |
 | `plugins.max_restart_attempts` | No | `5` | Maximum restart attempts before a crashed driver is abandoned |
 | `plugins.health_check_interval` | No | `60` | Seconds between periodic driver health checks. Set to `0` to disable |
-| `plugins.admin.enable` | No | `false` | Enable admin API endpoints (`/_nextbridge/drivers`, `/_nextbridge/admin/reload/{id}`). Requires `password` to be set |
+| `plugins.admin.enable` | No | `false` | Enable admin API endpoints (`/_nextbridge/drivers`, `/_nextbridge/plugins`, `/_nextbridge/admin/reload/{id}`). Requires `password` to be set |
 | `plugins.admin.password` | No | `""` | Password for admin API access (HTTP Basic Auth). Required when `admin.enable` is `true` |
 
 ```json
 {
   "global": {
     "plugins": {
+      "general": {
+        "enabled": ["stats"]
+      },
+      "config": {
+        "stats": {
+          "interval": 300
+        }
+      },
       "auto_restart": true,
       "max_restart_attempts": 5,
       "admin": {

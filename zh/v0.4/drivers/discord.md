@@ -141,6 +141,20 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
 
 将 `enable_recall` 设为 `false` 可禁用撤回的检测与应用。
 
+## 贴纸与自定义表情桥接
+
+Discord 贴纸（Sticker）和自定义表情（Custom Emoji）会自动转换为图片/GIF，作为附件桥接到其他平台。
+
+| 类型 | 格式 | 桥接方式 |
+|---|---|---|
+| 贴纸 | PNG / APNG | 作为 `image` 附件，使用贴纸 CDN URL |
+| 贴纸 | GIF | 作为 `image` 附件（GIF） |
+| 贴纸 | Lottie | 不支持直接桥接为图片，使用文本 `[Sticker: 名称]` 作为回退 |
+| 自定义表情 | 静态（`<:name:id>`） | 作为 `image` 附件（PNG），从 Discord CDN 下载 |
+| 自定义表情 | 动态（`<a:name:id>`） | 作为 `image` 附件（GIF），从 Discord CDN 下载 |
+
+无需额外配置即可使用，所有贴纸和自定义表情均通过 `bot_token` 接收后自动处理。
+
 ## 注意事项
 
 - Bot 发送的消息不会被再次桥接（Webhook 回显不会触发事件）。

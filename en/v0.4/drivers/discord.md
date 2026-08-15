@@ -141,6 +141,20 @@ When a Discord message is deleted, NextBridge detects the deletion and removes t
 
 Set `enable_recall` to `false` to disable both detection and application of recalls.
 
+## Sticker & Custom Emoji Bridging
+
+Discord stickers and custom emojis are automatically converted to images/GIFs and bridged to other platforms as attachments.
+
+| Type | Format | Bridging Method |
+|---|---|---|
+| Sticker | PNG / APNG | Sent as `image` attachment, using the sticker CDN URL |
+| Sticker | GIF | Sent as `image` attachment (GIF) |
+| Sticker | Lottie | Not directly bridgeable as an image; uses text `[Sticker: name]` as fallback |
+| Custom Emoji | Static (`<:name:id>`) | Sent as `image` attachment (PNG), downloaded from Discord CDN |
+| Custom Emoji | Animated (`<a:name:id>`) | Sent as `image` attachment (GIF), downloaded from Discord CDN |
+
+No additional configuration is needed. All stickers and custom emojis are automatically handled when received via `bot_token`.
+
 ## Notes
 
 - Bot messages are automatically ignored (webhook echoes are not re-bridged). Mass mentions (`@everyone`/`@here`) are sanitized by default.
