@@ -78,6 +78,7 @@ uv run main.py validate --config config.yaml --rules rules.yaml
 | `strict_echo_match` | 否 | `false` | 控制 NextBridge 防止 echo (回声) 到同一个频道/实例的行为。当为 `false`（默认）时，如果目标实例 ID 或频道与源消息相同，则跳过；当为 `true` 时，只有当目标实例 ID 和频道都与源消息相同时才跳过。默认为 `false` 以最大程度防止回声。 |
 | `fuzzy_mention_match` | 否 | `false` | 控制在没有精确绑定映射时，是否回退使用昵称进行模糊匹配。当为 `true` 时，会尝试将提及用户的名称与目标平台中已知的显示名称进行匹配。当为 `false`（默认）时，仅精确的 ID 绑定或原生平台内的提及有效。默认为 `false`。 |
 | `command_prefix` | 否 | `"nb"` | 内置桥接指令的前缀（不含前导 `/`）。例如将 `/nb bind` 改为 `/<前缀> bind`。 |
+| `send_timeout` | 否 | `2.0` | 单条消息发送允许的最长时间（秒）。超过该时间后，消息会被转至后台慢发送队列，不再阻塞后续消息；该慢消息会在后台继续发送。 |
 | `base_url` | 否 | — | 生成外部可访问链接时使用的公共基础 URL（如 QQ 合并转发页面链接）。示例：`https://bridge.example.com` |
 | `log` | 否 | — | 日志配置，用于控制日志输出和轮换。参见下方[日志配置](#日志配置)。 |
 | `database` | 否 | — | 数据库配置，用于存储消息和用户映射。参见下方[数据库配置](#数据库配置)。 |
