@@ -33,3 +33,11 @@ If you want to reset your identity or unlink your accounts, you can type:
 To see all accounts currently linked to your identity, type:
 
 `/list`
+
+## Check Runtime Status
+
+To view NextBridge's runtime status and version info, type:
+
+`/status`
+
+The reply includes the version (stable releases show the version number, development builds show the commit hash), uptime, per-platform driver status, and rule count.
