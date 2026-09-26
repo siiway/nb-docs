@@ -334,7 +334,7 @@ NextBridge 内置运行时指标计数器（消息收发数、规则命中数、
 }
 ```
 
-指标通过 `/_nextbridge/metrics` 以 Prometheus 文本格式暴露（需的管理 API 凭据）。详见[管理 API](./admin-api)。
+指标通过 `/_nextbridge/metrics` 以 Prometheus 文本格式暴露（需要管理 API 凭据）。详见[管理 API](./admin-api)。
 
 ## 热重载
 
