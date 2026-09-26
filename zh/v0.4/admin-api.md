@@ -25,7 +25,7 @@ global:
 
 ## 响应格式
 
-所有响应使用统一的信封结构。
+除 `GET /_nextbridge/metrics` 外，所有响应都使用统一的信封结构；metrics 端点返回 Prometheus 文本格式。
 
 成功：
 

@@ -25,7 +25,7 @@ Authentication is fail-closed: if the admin API is disabled, protected routes do
 
 ## Response format
 
-Every response is wrapped in a consistent envelope.
+Every response except `GET /_nextbridge/metrics` is wrapped in a consistent envelope; the metrics endpoint returns Prometheus text format.
 
 Success:
 
