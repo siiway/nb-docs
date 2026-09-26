@@ -15,8 +15,9 @@ A plugin is a Python class inheriting from `BasePlugin` with a `PluginMeta` desc
 | Registration | `register("name", PluginClass)` | Called at module import time |
 | Load | `async on_load(ctx)` | Receive `PluginContext`, do initial setup |
 | Enable | `async on_enable()` | Subscribe to events, register commands |
-| Disable | `async on_disable()` | Unsubscribe, clean up |
+| Disable | `async on_disable()` | Extra cleanup only — tracked registrations are removed automatically |
 | Unload | `async on_unload()` | Final cleanup before removal |
+| Restart | `PluginManager.restart_plugin(name)` | `disable → unload → load → enable` in one step |
 
 ### Plugin States
 
@@ -88,6 +89,18 @@ The `PluginContext` object provides access to core services:
 | `ctx.media()` | `module` | Media utilities (download attachments, convert formats) |
 | `ctx.logger(name)` | `Logger` | Get a loguru logger |
 
+### Trackable registration helpers
+
+Prefer the following helpers over calling `ctx.bridge` / `ctx.event_bus` / `ctx.middleware` directly. The plugin manager records every registration made through them and removes it automatically when the plugin is disabled or unloaded, so no manual teardown is required.
+
+| Helper | Description |
+|---|---|
+| `ctx.register_command(name, handler)` | Register a `/<prefix> <name>` command |
+| `ctx.on_event(event, handler)` | Subscribe to an `EventBus` event |
+| `ctx.add_receive_middleware(name, handler, priority=100)` | Add a receive middleware |
+| `ctx.add_send_middleware(name, handler, priority=100)` | Add a send middleware |
+| `ctx.cleanup()` | Manually remove all tracked registrations |
+
 ## Registering Commands
 
 Plugins can register custom commands that users invoke via `/<prefix> <command>`:
@@ -95,7 +108,7 @@ Plugins can register custom commands that users invoke via `/<prefix> <command>`
 ```python
 class MyPlugin(BasePlugin):
     async def on_enable(self):
-        self._ctx.bridge.register_command("hello", self._handle_hello)
+        self._ctx.register_command("hello", self._handle_hello)
 
     async def _handle_hello(self, msg, args):
         sender_info = self._ctx.bridge._senders.get(msg.instance_id)
@@ -108,15 +121,12 @@ The handler receives `(msg: NormalizedMessage, args: list[str])`.
 
 ## Subscribing to Events
 
-Use the `EventBus` to react to system events:
+Use `ctx.on_event` to react to system events; the subscription is removed automatically on disable/unload:
 
 ```python
 class MyPlugin(BasePlugin):
     async def on_enable(self):
-        self._ctx.event_bus.on("bridge.message", self._on_message)
-
-    async def on_disable(self):
-        self._ctx.event_bus.off("bridge.message", self._on_message)
+        self._ctx.on_event("bridge.message", self._on_message)
 
     async def _on_message(self, instance_id, platform, channel, text, **kwargs):
         # called for every bridged message
@@ -137,6 +147,10 @@ class MyPlugin(BasePlugin):
 | `plugin.enabled` | `name` |
 | `plugin.disabled` | `name` |
 | `plugin.error` | `name`, `error` |
+
+## Dependencies
+
+A plugin can declare other plugins it depends on via `PluginMeta.dependencies`. While a dependency is loaded or enabled, disabling/unloading it is refused (raises `PluginDependencyError`); unload the dependents first. Startup shutdown ignores this and force-unloads everything.
 
 ## Custom DB Migrations
 
@@ -199,25 +213,31 @@ plugins:
 
 ## Admin API
 
-Plugins can be inspected via the admin API:
+Plugins can be inspected and controlled via the admin API (all responses use the unified `{"ok": ..., "data": ...}` envelope):
 
 ```
-GET /_nextbridge/plugins
+GET  /_nextbridge/plugins
+POST /_nextbridge/admin/plugins/{name}/enable
+POST /_nextbridge/admin/plugins/{name}/disable
+POST /_nextbridge/admin/plugins/{name}/restart
 ```
 
-Returns:
+`GET` returns:
 
 ```json
 {
-  "plugins": {
-    "stats": {
-      "state": "ENABLED",
-      "version": "1.0.0",
-      "error": null,
-      "source": "builtin"
+  "ok": true,
+  "data": {
+    "plugins": {
+      "stats": {
+        "state": "ENABLED",
+        "version": "1.0.0",
+        "error": null,
+        "source": "builtin"
+      }
     }
   }
 }
 ```
 
-Requires HTTP Basic Auth (same credentials as drivers admin API).
+Requires HTTP Basic Auth (`plugins.admin.user` / `plugins.admin.password`). See the [Admin API](./admin-api) page for the full reference.

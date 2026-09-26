@@ -84,6 +84,7 @@ The `global` section contains configuration options that apply to all drivers un
 | `database` | No | — | Database configuration for storing message and user mappings. See [Database Configuration](#database-configuration) below. |
 | `http` | No | — | Shared HTTP server configuration for mounted driver webhooks. See [HTTP Server Configuration](#http-server-configuration) below. |
 | `plugins` | No | — | Plugin discovery and driver lifecycle configuration. See [Plugin Configuration](#plugin-configuration) below. |
+| `metrics` | No | — | Runtime metric counter configuration. See [Metrics Configuration](#metrics-configuration) below. |
 | `middleware` | No | — | Message middleware configuration. See [Middleware Configuration](#middleware-configuration) below. |
 
 ```json
@@ -285,7 +286,8 @@ Controls driver and general plugin discovery, lifecycle management, and per-plug
 | `plugins.auto_restart` | No | `true` | Automatically restart crashed drivers with exponential backoff |
 | `plugins.max_restart_attempts` | No | `5` | Maximum restart attempts before a crashed driver is abandoned |
 | `plugins.health_check_interval` | No | `60` | Seconds between periodic driver health checks. Set to `0` to disable |
-| `plugins.admin.enable` | No | `false` | Enable admin API endpoints (`/_nextbridge/drivers`, `/_nextbridge/plugins`, `/_nextbridge/admin/reload/{id}`). Requires `password` to be set |
+| `plugins.admin.enable` | No | `false` | Enable the admin API (read endpoints `/_nextbridge/{health,drivers,plugins,metrics,rules,config}` and write endpoints `/_nextbridge/admin/*`). Requires `password` to be set; when disabled, nothing except `health` is reachable |
+| `plugins.admin.user` | No | `"admin"` | Username for admin API access (HTTP Basic Auth) |
 | `plugins.admin.password` | No | `""` | Password for admin API access (HTTP Basic Auth). Required when `admin.enable` is `true` |
 
 ```json
@@ -304,12 +306,49 @@ Controls driver and general plugin discovery, lifecycle management, and per-plug
       "max_restart_attempts": 5,
       "admin": {
         "enable": true,
+        "user": "admin",
         "password": "your-secret-password"
       }
     }
   }
 }
 ```
+
+## Metrics Configuration
+
+NextBridge keeps runtime metric counters (messages received/sent, rule matches, send failures/timeouts, config reloads, driver restarts). Memory is the source of truth; counters are periodically snapshotted to the database (`metrics_counters` table) and reloaded after a restart.
+
+| Key | Required | Default | Description |
+|---|---|---|---|
+| `metrics.enabled` | No | `true` | Enable metric collection and the `/_nextbridge/metrics` endpoint |
+| `metrics.snapshot_interval` | No | `60` | Seconds between in-memory counter snapshots to the database. Set to `0` to disable periodic persistence |
+
+```json
+{
+  "global": {
+    "metrics": {
+      "enabled": true,
+      "snapshot_interval": 60
+    }
+  }
+}
+```
+
+Metrics are exposed in Prometheus text format at `/_nextbridge/metrics` (requires admin API credentials). See the [Admin API](./admin-api) page.
+
+## Hot Reload
+
+Some configuration can be reloaded at runtime (via the admin API or a `SIGHUP` signal) without restarting the process:
+
+- `command_prefix`
+- `strict_echo_match`
+- `fuzzy_mention_match`
+- `mention_notify_control`
+- `send_timeout`
+- The rules file (`rules.yaml`, etc.)
+- Per-instance driver configuration (the driver is rebuilt with the new config)
+
+The following **require a restart**: `proxy`, `log.*`, `database.*`, `http.*`, `plugins.*` (including `admin.*`) and `middleware`.
 
 ## Middleware Configuration
 

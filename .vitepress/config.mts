@@ -62,6 +62,7 @@ function enSidebar(version: string) {
       text: 'Extending',
       items: [
         { text: 'Plugin Development', link: `${prefix}/plugins` },
+        { text: 'Admin API', link: `${prefix}/admin-api` },
       ],
     },
   ]
@@ -126,6 +127,7 @@ function zhSidebar(version: string) {
       text: '扩展',
       items: [
         { text: '插件开发', link: `${prefix}/plugins` },
+        { text: '管理 API', link: `${prefix}/admin-api` },
       ],
     },
   ]

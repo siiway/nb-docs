@@ -155,6 +155,35 @@ uv run main.py validate -d custom-data/
 
 ---
 
+## match 条件（可选）
+
+为规则添加可选的来源过滤条件。条件只作用于**来源消息**，在转发之前判定；`connect` 规则对每个来源分别判定。不满足条件的消息不会触发该规则，也不会被记录映射。
+
+```jsonc
+{
+  "type": "forward",
+  "from": { "<实例ID>": { /* ...频道地址... */ } },
+  "to": { "<实例ID>": { /* ...频道地址... */ } },
+  "match": {
+    "keywords": ["deploy", "release"],
+    "users": {
+      "include": ["<平台用户ID 或 已绑定的全局用户ID>"],
+      "exclude": []
+    }
+  }
+}
+```
+
+| 键 | 类型 | 说明 |
+|---|---|---|
+| `keywords` | string[] | 消息文本包含其中任意一个即命中（大小写不敏感的子串匹配）。为空或缺省表示不限。 |
+| `users.include` | string[] | 仅转发这些用户的消息。可填平台原生用户 ID，或已绑定的全局用户 ID。为空或缺省表示不限。 |
+| `users.exclude` | string[] | 永不转发这些用户的消息，**优先级高于 `include`**。 |
+
+当 `keywords` 与 `users` 同时给出时，需要**全部满足**（AND）才会命中，且 `exclude` 始终优先于 `include`。
+
+---
+
 ## msg 配置
 
 控制消息发送到目标平台时的格式化方式。

@@ -15,8 +15,9 @@ NextBridge 支持通用插件系统，可扩展驱动集成之外的功能。插
 | 注册 | `register("name", PluginClass)` | 在模块导入时调用 |
 | 加载 | `async on_load(ctx)` | 接收 `PluginContext`，进行初始设置 |
 | 启用 | `async on_enable()` | 订阅事件、注册命令 |
-| 禁用 | `async on_disable()` | 取消订阅、清理 |
-| 卸载 | `async on_unload()` | 最终清理 |
+| 禁用 | `async on_disable()` | 仅做额外清理——可追踪的注册会被自动移除 |
+| 卸载 | `async on_unload()` | 移除前的最终清理 |
+| 重启 | `PluginManager.restart_plugin(name)` | 一步完成 `disable → unload → load → enable` |
 
 ### 插件状态
 
@@ -88,6 +89,18 @@ global:
 | `ctx.media()` | `module` | 媒体工具（下载附件、转换格式） |
 | `ctx.logger(name)` | `Logger` | 获取 loguru 日志记录器 |
 
+### 可追踪注册助手
+
+推荐使用以下助手，而非直接调用 `ctx.bridge` / `ctx.event_bus` / `ctx.middleware`。通过它们完成的注册会被插件管理器记录，并在插件被禁用或卸载时自动移除，无需手动清理。
+
+| 助手 | 说明 |
+|---|---|
+| `ctx.register_command(name, handler)` | 注册 `/<前缀> <name>` 命令 |
+| `ctx.on_event(event, handler)` | 订阅 `EventBus` 事件 |
+| `ctx.add_receive_middleware(name, handler, priority=100)` | 添加接收中间件 |
+| `ctx.add_send_middleware(name, handler, priority=100)` | 添加发送中间件 |
+| `ctx.cleanup()` | 手动移除所有已记录的注册 |
+
 ## 注册命令
 
 插件可以注册自定义命令，用户通过 `/<prefix> <command>` 调用：
@@ -95,7 +108,7 @@ global:
 ```python
 class MyPlugin(BasePlugin):
     async def on_enable(self):
-        self._ctx.bridge.register_command("hello", self._handle_hello)
+        self._ctx.register_command("hello", self._handle_hello)
 
     async def _handle_hello(self, msg, args):
         sender_info = self._ctx.bridge._senders.get(msg.instance_id)
@@ -108,15 +121,12 @@ class MyPlugin(BasePlugin):
 
 ## 订阅事件
 
-使用 `EventBus` 响应系统事件：
+使用 `ctx.on_event` 响应系统事件；该订阅会在禁用/卸载时自动移除：
 
 ```python
 class MyPlugin(BasePlugin):
     async def on_enable(self):
-        self._ctx.event_bus.on("bridge.message", self._on_message)
-
-    async def on_disable(self):
-        self._ctx.event_bus.off("bridge.message", self._on_message)
+        self._ctx.on_event("bridge.message", self._on_message)
 
     async def _on_message(self, instance_id, platform, channel, text, **kwargs):
         # 每条桥接消息都会调用
@@ -137,6 +147,10 @@ class MyPlugin(BasePlugin):
 | `plugin.enabled` | `name` |
 | `plugin.disabled` | `name` |
 | `plugin.error` | `name`, `error` |
+
+## 依赖
+
+插件可以通过 `PluginMeta.dependencies` 声明它依赖的其他插件。当某个依赖处于已加载或已启用状态时，禁用/卸载它会被拒绝（抛出 `PluginDependencyError`）；请先卸载依赖它的插件。启动关闭流程不检查依赖，会强制卸载全部插件。
 
 ## 自定义数据库迁移
 
@@ -199,25 +213,31 @@ plugins:
 
 ## 管理 API
 
-可以通过管理 API 检查插件：
+可以通过管理 API 检查和控制插件（所有响应都使用统一的 `{"ok": ..., "data": ...}` 信封）：
 
 ```
-GET /_nextbridge/plugins
+GET  /_nextbridge/plugins
+POST /_nextbridge/admin/plugins/{name}/enable
+POST /_nextbridge/admin/plugins/{name}/disable
+POST /_nextbridge/admin/plugins/{name}/restart
 ```
 
-返回：
+`GET` 返回：
 
 ```json
 {
-  "plugins": {
-    "stats": {
-      "state": "ENABLED",
-      "version": "1.0.0",
-      "error": null,
-      "source": "builtin"
+  "ok": true,
+  "data": {
+    "plugins": {
+      "stats": {
+        "state": "ENABLED",
+        "version": "1.0.0",
+        "error": null,
+        "source": "builtin"
+      }
     }
   }
 }
 ```
 
-需要 HTTP Basic Auth（与 driver 管理 API 使用相同的凭据）。
+需要 HTTP Basic Auth（`plugins.admin.user` / `plugins.admin.password`）。完整参考见[管理 API](./admin-api)。

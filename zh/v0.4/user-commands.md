@@ -2,40 +2,87 @@
 
 # 用户指令
 
-NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入这些指令来管理自己的身份和跨平台体验。默认指令前缀为 `/`，可通过配置文件中的 `command_prefix` 选项自定义。
+NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入这些指令来管理自己的身份和跨平台体验。
 
-## 账号绑定
+> **说明：** 内置指令位于 `nb` 命名空间下，例如 `/nb bind`。该 `nb` 前缀可通过全局 `command_prefix` 选项自定义——修改后请相应替换 `nb`。
 
-默认情况下，NextBridge 尝试通过匹配 **显示名称** 来映射跨平台的提及（Mention）。但是，如果用户在不同平台上的名称不同，这种方式可能不可靠。
+## `/nb bind`
 
-**账号绑定** 允许您显式地链接您在不同平台上的 ID，从而确保提及始终指向正确的账号。
+管理跨平台账号绑定，用于 @mention 跨平台路由。
 
-### 如何绑定账号
+默认情况下，NextBridge 尝试通过匹配 **显示名称** 来映射跨平台的提及（Mention）。账号绑定允许您显式地链接您在不同平台上的 ID，从而确保提及始终指向正确的账号。
 
-1.  **生成验证码**：在 **平台 A**（例如 Discord）上输入 `/bind`。
-    -   NextBridge 将回复一个唯一的 6 位数字验证码（例如 `123456`）。
-2.  **确认链接**：在 **平台 B**（例如 QQ）上输入 `/confirm 123456`。
-3.  **成功**：您的 Discord 和 QQ 账号现已成功链接！
+| 命令 | 说明 |
+|---|---|
+| `/nb bind setup` | 生成 6 位绑定码（5 分钟有效） |
+| `/nb bind confirm <code>` | 在另一个平台上确认绑定码 |
+| `/nb bind rm [instance_id]` | 移除特定绑定或全部绑定 |
+| `/nb bind list` | 列出所有已绑定的账号 |
 
-链接后，每当有人在 Discord 上提及您时，NextBridge 将解析出您准确的 QQ 用户 ID，从而在目标平台上触发原生通知。
+### 示例
 
-### 如何解除绑定
+1. 在 **平台 A**（如 Discord）上输入 `/nb bind setup`——NextBridge 将回复一个唯一的 6 位数字验证码（例如 `123456`）。
+2. 在 **平台 B**（如 QQ）上输入 `/nb bind confirm 123456`。
+3. 账号绑定完成：在任一平台上提及您时，都会解析为您在其他平台绑定的账号。
 
-如果您想重置身份或取消账号链接，可以输入：
+## `/nb notify`
 
--   `/rm`：移除当前全局身份关联的 **所有** 平台链接。
--   `/rm <instance_id>`：仅移除特定实例（如 `my_qq`）的绑定。
+控制哪些绑定的平台接收 @mention 通知。
 
-### 如何查看绑定
+> **配置开关**：`global.mention_notify_control`（默认 `true`）。设为 `false` 可全局禁用此功能。
 
-要查看当前所有已链接到您身份的账号，可以输入：
+| 命令 | 说明 |
+|---|---|
+| `/nb notify mode all` | 所有绑定的平台都接收 @通知（默认） |
+| `/nb notify mode whitelist` | 仅白名单中的平台接收通知 |
+| `/nb notify mode blacklist` | 除黑名单外的平台都接收通知 |
+| `/nb notify add <instance_id>` | 添加平台到列表（如 `qq`、`discord`、`telegram`） |
+| `/nb notify rm <instance_id>` | 从列表中移除平台 |
+| `/nb notify list` | 查看当前通知偏好设置 |
 
-`/list`
+### 三种模式
 
-## 查看运行状态
+- **all** — 默认。所有绑定平台都接收 @通知。
+- **whitelist** — 仅通过 `notify add` 添加的平台接收通知。
+- **blacklist** — 除通过 `notify add` 添加的平台外，其他平台都接收通知。
 
-要查看 NextBridge 的运行状态与版本信息，可以输入：
+### 示例
 
-`/status`
+```
+/nb notify mode whitelist
+/nb notify add discord
+/nb notify add qq
+/nb notify list
+```
+
+设置后，即使绑定了 Telegram，@通知也只会发送到 Discord 和 QQ 绑定的账号。
+
+## `/nb status`
+
+查看 NextBridge 的运行状态与版本信息。
+
+```
+/nb status
+```
 
 回复内容包含：版本号（稳定版本显示版本号，开发版本显示提交哈希）、运行时长、各平台驱动状态、规则数量等。
+
+## `/ping`
+
+通过昵称跨平台查找用户并 @ 他们。
+
+```
+/ping <昵称>
+```
+
+## 配置
+
+### `mention_notify_control`
+
+```yaml
+global:
+  mention_notify_control: true   # 默认：启用 /nb notify 命令
+  mention_notify_control: false  # 禁用此功能
+```
+
+禁用后，所有绑定平台始终接收 @通知，`/nb notify` 命令返回已禁用提示。

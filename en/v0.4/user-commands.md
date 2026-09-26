@@ -4,40 +4,85 @@
 
 NextBridge supports several built-in commands that users can type directly into their chat platforms to manage their identity and cross-platform experience.
 
-> **Note:** All commands below use the `/` prefix by default (e.g. `/bind`). The prefix is configurable via the `command_prefix` option — if changed, replace `/` accordingly.
+> **Note:** Built-in commands live under the `nb` namespace, e.g. `/nb bind`. The `nb` prefix is configurable via the global `command_prefix` option — if changed, replace `nb` accordingly.
 
-## Account Binding
+## `/nb bind`
 
-By default, NextBridge tries to map mentions across platforms by matching **display names**. However, this can be unreliable if users have different names on different platforms. 
+Manage cross-platform account bindings for @mention routing.
 
-**Account Binding** allows you to explicitly link your IDs across platforms so that mentions always target the correct account.
+By default, NextBridge tries to map mentions across platforms by matching **display names**. Account binding lets you explicitly link your IDs across platforms so mentions always target the correct account.
 
-### How to bind accounts
+| Command | Description |
+|---|---|
+| `/nb bind setup` | Generate a 6-digit binding code (valid for 5 minutes) |
+| `/nb bind confirm <code>` | Confirm a binding code from another platform |
+| `/nb bind rm [instance_id]` | Remove a specific binding or all bindings |
+| `/nb bind list` | List all linked accounts |
 
-1.  **Generate a code**: On **Platform A** (e.g., Discord), type `/bind`.
-    -   NextBridge will reply with a unique 6-digit code (e.g., `123456`).
-2.  **Confirm the link**: On **Platform B** (e.g., QQ), type `/confirm 123456`.
-3.  **Success**: Your Discord and QQ accounts are now linked!
+### Example
 
-Once linked, whenever someone mentions you on Discord, NextBridge will resolve your exact QQ User ID, triggering a native notification on the target platform.
+1. On **Platform A** (e.g. Discord), type `/nb bind setup` — NextBridge replies with a 6-digit code (e.g. `123456`).
+2. On **Platform B** (e.g. QQ), type `/nb bind confirm 123456`.
+3. Your accounts are now linked: mentions of you on either platform resolve to your bound accounts elsewhere.
 
-### How to remove bindings
+## `/nb notify`
 
-If you want to reset your identity or unlink your accounts, you can type:
+Control which bound platforms receive @mention notifications.
 
--   `/rm`: Removes **all** links associated with your current global identity across all platforms.
--   `/rm <instance_id>`: Removes only the binding for a specific instance (e.g., `my_qq`).
+> **Config toggle**: `global.mention_notify_control` (default `true`). Set to `false` to disable this feature globally.
 
-### How to list bindings
+| Command | Description |
+|---|---|
+| `/nb notify mode all` | Receive @mention notifications on all bound platforms (default) |
+| `/nb notify mode whitelist` | Only receive notifications on explicitly added platforms |
+| `/nb notify mode blacklist` | Receive notifications on all platforms except listed ones |
+| `/nb notify add <instance_id>` | Add a platform to the whitelist/blacklist (e.g. `qq`, `discord`, `telegram`) |
+| `/nb notify rm <instance_id>` | Remove a platform from the list |
+| `/nb notify list` | Show current notification preference |
 
-To see all accounts currently linked to your identity, type:
+### Modes
 
-`/list`
+- **all** — Default. All bound platforms receive @mention notifications.
+- **whitelist** — Only platforms added via `notify add` receive notifications.
+- **blacklist** — All platforms except those added via `notify add` receive notifications.
 
-## Check Runtime Status
+### Example
 
-To view NextBridge's runtime status and version info, type:
+```
+/nb notify mode whitelist
+/nb notify add discord
+/nb notify add qq
+/nb notify list
+```
 
-`/status`
+After this setup, @mention notifications are only delivered to Discord and QQ bound accounts, even if Telegram is also bound.
+
+## `/nb status`
+
+View NextBridge's runtime status and version info.
+
+```
+/nb status
+```
 
 The reply includes the version (stable releases show the version number, development builds show the commit hash), uptime, per-platform driver status, and rule count.
+
+## `/ping`
+
+Look up a user by nickname across platforms and tag them.
+
+```
+/ping <nickname>
+```
+
+## Configuration
+
+### `mention_notify_control`
+
+```yaml
+global:
+  mention_notify_control: true   # default: enable /nb notify
+  mention_notify_control: false  # disable the feature entirely
+```
+
+When disabled, all bound platforms always receive @mention notifications, and `/nb notify` commands return a disabled hint.

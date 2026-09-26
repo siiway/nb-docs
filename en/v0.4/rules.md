@@ -155,6 +155,35 @@ Routes messages from one set of channels to another (unidirectional). Omit `"typ
 
 ---
 
+## match conditions (optional)
+
+Add optional source filters to a rule. Conditions apply to the **source message** and are evaluated before forwarding; `connect` rules evaluate them per source. A message that does not satisfy the conditions neither triggers the rule nor records a mapping.
+
+```jsonc
+{
+  "type": "forward",
+  "from": { "<instance_id>": { /* ...channel address... */ } },
+  "to": { "<instance_id>": { /* ...channel address... */ } },
+  "match": {
+    "keywords": ["deploy", "release"],
+    "users": {
+      "include": ["<platform user id or bound global user id>"],
+      "exclude": []
+    }
+  }
+}
+```
+
+| Key | Type | Description |
+|---|---|---|
+| `keywords` | string[] | Match if the message text contains any of these (case-insensitive substring). Empty/absent means no constraint. |
+| `users.include` | string[] | Only forward messages from these users. Accepts a platform user id or a bound global user id. Empty/absent means no constraint. |
+| `users.exclude` | string[] | Never forward messages from these users; **takes precedence over `include`**. |
+
+When both `keywords` and `users` are present, all must be satisfied (AND), and `exclude` always wins over `include`.
+
+---
+
 ## msg config
 
 Controls how the message is formatted when sent to a target.

@@ -84,6 +84,7 @@ uv run main.py validate --config config.yaml --rules rules.yaml
 | `database` | 否 | — | 数据库配置，用于存储消息和用户映射。参见下方[数据库配置](#数据库配置)。 |
 | `http` | 否 | — | 共享 HTTP 服务器配置，用于挂载驱动器 Webhook。参见下方 [HTTP 服务器配置](#http-服务器配置)。 |
 | `plugins` | 否 | — | 插件发现与驱动器生命周期配置。参见下方 [插件配置](#插件配置)。 |
+| `metrics` | 否 | — | 运行时指标统计配置。参见下方 [指标配置](#指标配置)。 |
 | `middleware` | 否 | — | 消息中间件配置。参见下方 [中间件配置](#中间件配置)。 |
 
 ```json
@@ -285,7 +286,8 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
 | `plugins.auto_restart` | 否 | `true` | 崩溃的驱动器自动重启（指数退避） |
 | `plugins.max_restart_attempts` | 否 | `5` | 崩溃驱动器放弃重启前的最大重试次数 |
 | `plugins.health_check_interval` | 否 | `60` | 定期驱动器健康检查间隔（秒）。设为 `0` 禁用 |
-| `plugins.admin.enable` | 否 | `false` | 启用管理 API 端点（`/_nextbridge/drivers`、`/_nextbridge/plugins`、`/_nextbridge/admin/reload/{id}`）。需同时设置 `password` |
+| `plugins.admin.enable` | 否 | `false` | 启用管理 API（读端点 `/_nextbridge/{health,drivers,plugins,metrics,rules,config}` 与写端点 `/_nextbridge/admin/*`）。需同时设置 `password`；未启用时除 `health` 外全部不可达 |
+| `plugins.admin.user` | 否 | `"admin"` | 管理 API 的用户名（HTTP Basic Auth） |
 | `plugins.admin.password` | 否 | `""` | 管理 API 访问密码（HTTP Basic Auth）。`admin.enable` 为 `true` 时必填 |
 
 ```json
@@ -304,12 +306,49 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
       "max_restart_attempts": 5,
       "admin": {
         "enable": true,
+        "user": "admin",
         "password": "your-secret-password"
       }
     }
   }
 }
 ```
+
+## 指标配置
+
+NextBridge 内置运行时指标计数器（消息收发数、规则命中数、发送失败/超时数、配置重载次数、驱动器重启次数）。内存为计数真源，并会周期性快照到数据库（`metrics_counters` 表），进程重启后继续累加。
+
+| 键 | 是否必填 | 默认值 | 说明 |
+|---|---|---|---|
+| `metrics.enabled` | 否 | `true` | 是否启用指标收集与 `/_nextbridge/metrics` 端点 |
+| `metrics.snapshot_interval` | 否 | `60` | 内存计数快照写入数据库的间隔（秒）。设为 `0` 可禁用周期持久化 |
+
+```json
+{
+  "global": {
+    "metrics": {
+      "enabled": true,
+      "snapshot_interval": 60
+    }
+  }
+}
+```
+
+指标通过 `/_nextbridge/metrics` 以 Prometheus 文本格式暴露（需的管理 API 凭据）。详见[管理 API](./admin-api)。
+
+## 热重载
+
+部分配置可在运行时热重载（通过管理 API 或 `SIGHUP` 信号），无需重启进程：
+
+- `command_prefix`
+- `strict_echo_match`
+- `fuzzy_mention_match`
+- `mention_notify_control`
+- `send_timeout`
+- 规则文件（`rules.yaml` 等）
+- 驱动器实例配置（会以新配置重建对应驱动器）
+
+以下配置**需要重启**才能生效：`proxy`、`log.*`、`database.*`、`http.*`、`plugins.*`（含 `admin.*`）与 `middleware`。
 
 ## 中间件配置
 
