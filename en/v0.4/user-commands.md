@@ -67,6 +67,14 @@ View NextBridge's runtime status and version info.
 
 The reply includes the version (stable releases show the version number, development builds show the commit hash), uptime, per-platform driver status, and rule count.
 
+## `/nb help`
+
+Show the built-in command help.
+
+```
+/nb help
+```
+
 ## `/ping`
 
 Look up a user by nickname across platforms and tag them.
@@ -74,6 +82,28 @@ Look up a user by nickname across platforms and tag them.
 ```
 /ping <nickname>
 ```
+
+## Discord native commands
+
+When the Discord driver runs with a bot token (and `enable_native_commands` is not disabled), NextBridge registers native slash commands. They mirror the text commands above but expose the structural tokens as subcommands and choice menus, so you never type them by hand:
+
+```
+/nb bind setup
+/nb bind confirm code:<code>
+/nb bind rm [instance_id:<instance_id>]
+/nb bind list
+/nb notify mode mode:<all|whitelist|blacklist>
+/nb notify add instance_id:<instance_id>
+/nb notify rm instance_id:<instance_id>
+/nb notify list
+/nb status
+/nb help
+/ping
+```
+
+- Actions (`setup`, `confirm`, `mode`, ...) are offered as subcommands; `mode` is a choice menu. Only free-form values such as the binding `<code>` and `<instance_id>` are typed as text.
+- The root command name follows `command_prefix`. If the prefix is not a valid Discord command name (1–32 chars of lowercase letters, digits, `-` or `_`), the driver falls back to `nb` and logs a warning.
+- Changing `command_prefix` requires a restart to update the registered slash-command names.
 
 ## Configuration
 

@@ -67,6 +67,14 @@ NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入
 
 回复内容包含：版本号（稳定版本显示版本号，开发版本显示提交哈希）、运行时长、各平台驱动状态、规则数量等。
 
+## `/nb help`
+
+显示内置命令帮助。
+
+```
+/nb help
+```
+
 ## `/ping`
 
 通过昵称跨平台查找用户并 @ 他们。
@@ -74,6 +82,28 @@ NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入
 ```
 /ping <昵称>
 ```
+
+## Discord 原生命令
+
+当 Discord 驱动使用 bot token 运行（且未禁用 `enable_native_commands`）时，NextBridge 会注册原生斜杠命令。它们与上文文本命令等价，但把结构性 token 暴露为子命令与选择菜单，无需手动输入：
+
+```
+/nb bind setup
+/nb bind confirm code:<验证码>
+/nb bind rm [instance_id:<实例 ID>]
+/nb bind list
+/nb notify mode mode:<all|whitelist|blacklist>
+/nb notify add instance_id:<实例 ID>
+/nb notify rm instance_id:<实例 ID>
+/nb notify list
+/nb status
+/nb help
+/ping
+```
+
+- 动作（`setup`、`confirm`、`mode` 等）以子命令形式提供，`mode` 为选择菜单；仅绑定 `<验证码>` 与 `<实例 ID>` 等自由取值需手动输入。
+- 根命令名跟随 `command_prefix`。若该前缀不是合法的 Discord 命令名（1–32 个字符，仅小写字母、数字、`-` 或 `_`），驱动会回退为 `nb` 并记录一条警告。
+- 修改 `command_prefix` 需重启后才能更新已注册的斜杠命令名。
 
 ## 配置
 
