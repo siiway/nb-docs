@@ -30,7 +30,7 @@ features:
   - title: 按频道定制消息格式
     details: 为每个目标平台独立设置消息格式。Discord Webhook 和 Telegram richheader 支持原生用户名和头像显示，QQ 使用简洁的文字前缀。
   - title: 用户指令
-    details: 用户可通过 /bind 和 /confirm 跨平台绑定账号，确保完美的跨平台提及和通知。
+    details: 用户可通过 /nb bind 和 /nb bind confirm 跨平台绑定账号，确保完美的跨平台提及和通知。
     link: /zh/v0.4/user-commands
     linkText: 查看用户指令
   - title: JSON、YAML 和 TOML 配置

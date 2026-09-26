@@ -4,7 +4,7 @@
 
 NextBridge supports several built-in commands that users can type directly into their chat platforms to manage their identity and cross-platform experience.
 
-> **Note:** Built-in commands live under the `nb` namespace, e.g. `/nb bind`. The `nb` prefix is configurable via the global `command_prefix` option — if changed, replace `nb` accordingly.
+> **Note:** Built-in commands live under the `nb` namespace, e.g. `/nb bind` and `/nb bind confirm`. The `nb` prefix is configurable via the global `command_prefix` option — if changed, replace `nb` accordingly.
 
 ## `/nb bind`
 

@@ -4,7 +4,7 @@
 
 NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入这些指令来管理自己的身份和跨平台体验。
 
-> **说明：** 内置指令位于 `nb` 命名空间下，例如 `/nb bind`。该 `nb` 前缀可通过全局 `command_prefix` 选项自定义——修改后请相应替换 `nb`。
+> **说明：** 内置指令位于 `nb` 命名空间下，例如 `/nb bind` 和 `/nb bind confirm`。该 `nb` 前缀可通过全局 `command_prefix` 选项自定义——修改后请相应替换 `nb`。
 
 ## `/nb bind`
 
