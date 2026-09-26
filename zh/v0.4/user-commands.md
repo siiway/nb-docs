@@ -82,7 +82,7 @@ NextBridge 支持多个内置指令，用户可以直接在聊天平台中输入
 ```yaml
 global:
   mention_notify_control: true   # 默认：启用 /nb notify 命令
-  mention_notify_control: false  # 禁用此功能
+  # mention_notify_control: false  # 备选：禁用此功能
 ```
 
 禁用后，所有绑定平台始终接收 @通知，`/nb notify` 命令返回已禁用提示。

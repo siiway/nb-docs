@@ -82,7 +82,7 @@ Look up a user by nickname across platforms and tag them.
 ```yaml
 global:
   mention_notify_control: true   # default: enable /nb notify
-  mention_notify_control: false  # disable the feature entirely
+  # mention_notify_control: false  # alternative: disable the feature entirely
 ```
 
 When disabled, all bound platforms always receive @mention notifications, and `/nb notify` commands return a disabled hint.
