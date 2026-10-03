@@ -183,6 +183,7 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
 | `database.sslmode` | 否 | — | PostgreSQL SSL 模式（如 `require`、`prefer`、`disable`）。仅适用于 PostgreSQL。 |
 | `database.connect_timeout` | 否 | — | PostgreSQL 连接超时（秒）。仅适用于 PostgreSQL。 |
 | `database.application_name` | 否 | — | PostgreSQL 应用名称，用于连接标识。仅适用于 PostgreSQL。 |
+| `database.message_mapping_retention_days` | 否 | `30` | 消息映射保留天数。启动时及保存映射期间最多每小时删除一次更早的记录；设置为 `0` 可禁用清理。 |
 
 ### 数据库 URL 示例
 

@@ -183,6 +183,7 @@ NextBridge uses SQLAlchemy for database operations, which supports multiple data
 | `database.sslmode` | No | — | PostgreSQL SSL mode (e.g., `require`, `prefer`, `disable`). Only applies to PostgreSQL. |
 | `database.connect_timeout` | No | — | PostgreSQL connection timeout in seconds. Only applies to PostgreSQL. |
 | `database.application_name` | No | — | PostgreSQL application name for connection identification. Only applies to PostgreSQL. |
+| `database.message_mapping_retention_days` | No | `30` | Days to retain message mappings. Older rows are deleted at startup and at most hourly while mappings are saved. Set to `0` to disable cleanup. |
 
 ### Database URL Examples
 
