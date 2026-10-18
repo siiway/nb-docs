@@ -272,6 +272,68 @@ NextBridge 使用 SQLAlchemy 进行数据库操作，支持多种数据库后端
 | `plugins.drivers.enabled` | 否 | `[]` | 要加载的驱动器名称。空列表 = 从配置文件键自动发现 |
 | `plugins.drivers.external` | `dict` | `{}` | 外部驱动器导入，按名称键值 |
 
+#### 外部驱动器
+
+NextBridge 从四个来源加载驱动器（优先级高者覆盖低者）：
+
+| 来源 | 方式 |
+|---|---|
+| Pip 包（入口点） | 包声明 `nextbridge.drivers` 入口点——自动发现，无需配置 |
+| Pip 包（显式） | 在 `plugins.drivers.external` 中声明模块（见下） |
+| 本地文件 | 将 `<platform>.py` 放入 `plugins.paths` 列出的目录（文件名 = 平台名） |
+| 内置 | NextBridge 自带的 `drivers/<platform>.py` |
+
+驱动器模块必须在导入时调用 `drivers.registry.register()`，与内置驱动器使用
+相同契约。若名称与内置驱动器冲突，外部来源会**覆盖**内置。外部驱动器还会
+通过 `drivers.registry.register_cli()` 向 CLI 添加子命令（例如配对命令），
+这些子命令与内置驱动器一同在启动时发现。
+
+Pip 包通过 `pyproject.toml` 声明驱动器：
+
+```toml
+[project.entry-points."nextbridge.drivers"]
+myplatform = "nextbridge_myplatform.driver"
+```
+
+随后将包安装到 NextBridge 运行的环境中。对于镜像文件系统只读或临时的
+Docker 部署，建议安装到挂载的数据目录并通过 `PYTHONPATH` 暴露（入口点
+元数据在容器重建后依然有效）：
+
+```bash
+docker run --rm -v ./data:/app/data -e NEXTBRIDGE_DATA_PATH=/app/data \
+  ghcr.io/siiway/nextbridge:latest \
+  /app/.venv/bin/python -m pip install --target=/app/data/pylibs nextbridge-myplatform
+```
+
+```yaml
+# docker-compose（或等价的 nix 容器配置）
+volumes: [ "./data:/app/data" ]
+environment:
+  - NEXTBRIDGE_DATA_PATH=/app/data
+  - PYTHONPATH=/app/data/pylibs
+```
+
+（直接 `pip install --no-deps nextbridge-myplatform` 到 `/app/.venv` 也可行，
+但安装内容位于容器层，容器重建后会丢失。）
+
+然后添加实例配置：
+
+若不想依赖入口点自动发现，可显式固定模块：
+
+```json
+{
+  "global": {
+    "plugins": {
+      "drivers": {
+        "external": {
+          "myplatform": { "module": "nextbridge_myplatform.driver" }
+        }
+      }
+    }
+  }
+}
+```
+
 ### 通用插件
 
 | 键 | 是否必填 | 默认值 | 说明 |

@@ -272,6 +272,83 @@ Controls driver and general plugin discovery, lifecycle management, and per-plug
 | `plugins.drivers.enabled` | No | `[]` | Driver names to load. Empty = auto-discover from config file keys |
 | `plugins.drivers.external` | `dict` | `{}` | External driver imports, keyed by driver name |
 
+#### External drivers
+
+NextBridge loads third-party drivers from four sources (higher priority wins):
+
+| Source | How |
+|---|---|
+| Pip package (entry point) | Package declares a `nextbridge.drivers` entry point — auto-discovered, no config needed |
+| Pip package (explicit) | Declare the module in `plugins.drivers.external` (see below) |
+| Local file | Drop a `<platform>.py` into a directory listed in `plugins.paths` (file stem = platform name) |
+| Built-in | `drivers/<platform>.py` shipped with NextBridge |
+
+A driver module must call `drivers.registry.register()` at import time — the
+same contract as built-in drivers. If a name collides with a built-in driver,
+the external source **overrides** it. External drivers also add their
+`register_cli()` subcommands to the CLI (e.g. pairing commands).
+
+Pip packages advertise a driver via `pyproject.toml`:
+
+```toml
+[project.entry-points."nextbridge.drivers"]
+myplatform = "nextbridge_myplatform.driver"
+```
+
+Then install the package into the environment NextBridge runs in. For a Docker
+deployment whose image filesystem is read-only or ephemeral, install into the
+mounted data directory and expose it via `PYTHONPATH` (entry-point metadata
+survives container recreates):
+
+```bash
+docker run --rm -v ./data:/app/data -e NEXTBRIDGE_DATA_PATH=/app/data \
+  ghcr.io/siiway/nextbridge:latest \
+  /app/.venv/bin/python -m pip install --target=/app/data/pylibs nextbridge-myplatform
+```
+
+```yaml
+# docker-compose (or equivalent nix container config)
+volumes: [ "./data:/app/data" ]
+environment:
+  - NEXTBRIDGE_DATA_PATH=/app/data
+  - PYTHONPATH=/app/data/pylibs
+```
+
+(`pip install --no-deps nextbridge-myplatform` directly into `/app/.venv` also
+works, but the install lives in the container layer and is lost when the
+container is recreated.)
+
+Then add the instance config:
+
+```json
+{
+  "myplatform": {
+    "default": { "url": "https://example.com", "token": "..." }
+  }
+}
+```
+
+If you don't want to rely on entry-point auto-discovery, pin the module
+explicitly:
+
+```json
+{
+  "global": {
+    "plugins": {
+      "drivers": {
+        "external": {
+          "myplatform": { "module": "nextbridge_myplatform.driver" }
+        }
+      }
+    }
+  }
+}
+```
+
+External drivers may add CLI subcommands via `drivers.registry.register_cli()`
+(e.g. `python main.py myplatform pair ...`); these are discovered at startup
+alongside built-in drivers.
+
 ### General Plugins
 
 | Key | Required | Default | Description |
