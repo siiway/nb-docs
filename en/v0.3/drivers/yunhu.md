@@ -6,7 +6,7 @@ The Yunhu driver receives messages via a webhook HTTP server and sends via the Y
 
 ## Setup
 
-1. Go to the [Yunhu developer portal](https://www.yunhuim.com/) and create a bot.
+1. Go to the [Yunhu developer portal](https://www.yhchat.com/control/) and create a bot.
 2. Copy the bot token.
 3. Set the bot's webhook URL to `http://<your-server>:<webhook_port><webhook_path>` (e.g. `http://1.2.3.4:8765/yunhu-webhook`).
 4. Add the bot to your group.

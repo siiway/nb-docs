@@ -6,7 +6,7 @@
 
 ## 准备工作
 
-1. 前往[云湖开发者平台](https://www.yunhuim.com/)创建一个机器人。
+1. 前往[云湖开发者平台](https://www.yhchat.com/control/)创建一个机器人。
 2. 复制机器人 Token。
 3. 将机器人的 Webhook 地址设置为 `http://<你的服务器>:<webhook_port><webhook_path>`（例如 `http://1.2.3.4:8765/yunhu-webhook`）。
 4. 将机器人添加到你的群组。
