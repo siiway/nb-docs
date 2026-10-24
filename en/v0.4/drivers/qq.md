@@ -111,6 +111,7 @@ QQ (OneBot 11) has **no native "edit message" API**, so an edit made on another 
 
 - When an edit is bridged to QQ, NextBridge sends a **new message** that **quotes (replies to)** the original bridged message and prepends `edit_prefix` (default `[编辑]`).
 - Repeated edits always quote the **original** bridged message, so the edit thread stays anchored to it.
+- Each simulated edit message is saved in the message mapping, allowing later edits, recalls, or replies to that `[编辑]` message to continue through bridge routing.
 - Only text content is synced. Attachments are not re-sent on edit.
 - Set `edit_via_reply` to `false` to disable this behavior and ignore incoming edits.
 
