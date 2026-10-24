@@ -17,8 +17,10 @@ NextBridge 通过 OneBot 11 WebSocket 协议连接 QQ。支持多种协议后端
 | 键 | 是否必填 | 默认值 | 说明 |
 |---|---|---|---|
 | `protocol` | 否 | `"napcat"` | OneBot 11 后端协议：`"napcat"`、`"lagrange"` 或 `"onebot_v11"`。控制哪些协议特定功能可用（合并转发 API、流式上传等） |
-| `ws_url` | 否 | `ws://127.0.0.1:3001` | OneBot 11 服务端的 WebSocket 地址 |
-| `ws_token` | 否 | — | 访问令牌（作为 `?access_token=...` 追加到 URL） |
+| `connection_mode` | 否 | `"forward"` | WebSocket 连接方向：`"forward"` 由 NextBridge 连接 NapCat 的 WebSocket 服务端；`"reverse"` 由 NapCat 主动连接 NextBridge 提供的 WebSocket 服务端。 |
+| `ws_url` | 否 | `ws://127.0.0.1:3001` | `connection_mode: "forward"` 时 NapCat WebSocket 服务端的地址 |
+| `ws_token` | 否 | — | OneBot 访问令牌。正向模式会以 `access_token` 查询参数发送；反向模式要求 NapCat 使用 `Authorization: Bearer <token>` 连接。 |
+| `reverse_ws_path` | 否 | `/onebot/v11/<实例ID>` | `connection_mode: "reverse"` 时 NextBridge 提供的 WebSocket 路径。 |
 | `ws_ssl_verify` | 否 | `true` | WSS 连接是否验证 TLS 证书。自签名证书请设为 `false` |
 | `max_file_size` | 否 | `10485760`（10 MB） | 发送附件时单个文件的最大下载字节数 |
 | `cqface_mode` | 否 | `"gif"` | QQ 表情段的呈现方式。`"gif"` 将表情以动态 GIF 图上传（优先取自本地 `db/cqface-gif/` 数据库；本地缺失时自动回退到远程主机下载，见 `forward_render_cqface_gif`）；`"emoji"` 以内联文本呈现，如 `:cqface306:`。 |
@@ -50,6 +52,12 @@ NextBridge 通过 OneBot 11 WebSocket 协议连接 QQ。支持多种协议后端
   }
 }
 ```
+
+## 反向 WebSocket 连接
+
+将 `connection_mode` 设为 `"reverse"` 后，NextBridge 会在共享 HTTP 服务上提供 WebSocket 端点；NapCat 应在「网络配置」中新建 **WebSocket 客户端**并连接到该地址。例如实例 ID 为 `qq_main`、HTTP 服务监听 `9080` 时，地址为 `ws://<NextBridge主机>:9080/onebot/v11/qq_main`。可用 `reverse_ws_path` 自定义路径。
+
+若配置了 `ws_token`，必须在 NapCat 的反向 WebSocket 配置中使用相同 token；NextBridge 会验证 `Authorization: Bearer <token>`，避免未授权客户端控制机器人。每个实例同一时间只接受一个反向连接。
 
 ## 规则频道键
 

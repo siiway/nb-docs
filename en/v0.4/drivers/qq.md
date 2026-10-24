@@ -17,8 +17,10 @@ Add under `qq.<instance_id>` in `config.json`:
 | Key | Required | Default | Description |
 |---|---|---|---|
 | `protocol` | No | `"napcat"` | OneBot 11 backend protocol: `"napcat"`, `"lagrange"`, or `"onebot_v11"`. Controls which protocol-specific features are available (forward API, stream upload, etc.) |
-| `ws_url` | No | `ws://127.0.0.1:3001` | WebSocket URL of the OneBot 11 server |
-| `ws_token` | No | — | Access token (appended as `?access_token=...`) |
+| `connection_mode` | No | `"forward"` | WebSocket connection direction: `"forward"` has NextBridge connect to NapCat's WebSocket server; `"reverse"` has NapCat connect to a WebSocket server hosted by NextBridge. |
+| `ws_url` | No | `ws://127.0.0.1:3001` | NapCat WebSocket server URL when `connection_mode` is `"forward"` |
+| `ws_token` | No | — | OneBot access token. Forward mode sends it as the `access_token` query parameter; reverse mode requires NapCat to connect with `Authorization: Bearer <token>`. |
+| `reverse_ws_path` | No | `/onebot/v11/<instance_id>` | WebSocket path hosted by NextBridge when `connection_mode` is `"reverse"`. |
 | `ws_ssl_verify` | No | `true` | Whether to verify TLS certificates for WSS connections. Set to `false` for self-signed certs |
 | `max_file_size` | No | `10485760` (10 MB) | Maximum bytes to download per attachment when sending |
 | `cqface_mode` | No | `"gif"` | How to represent QQ face/emoji segments. `"gif"` uploads the face as an animated GIF (preferring the local `db/cqface-gif/` database, and falling back to a remote host download when a face is missing locally — see `forward_render_cqface_gif`); `"emoji"` renders it as inline text, e.g. `:cqface306:`. |
@@ -50,6 +52,12 @@ Add under `qq.<instance_id>` in `config.json`:
   }
 }
 ```
+
+## Reverse WebSocket connection
+
+Set `connection_mode` to `"reverse"` to make NextBridge host a WebSocket endpoint on the shared HTTP server. In NapCat, create a **WebSocket Client** network configuration pointing to that endpoint. For example, an instance named `qq_main` with NextBridge HTTP listening on port `9080` uses `ws://<NextBridge-host>:9080/onebot/v11/qq_main`. Use `reverse_ws_path` to choose another path.
+
+When `ws_token` is configured, set the same token in NapCat's reverse WebSocket configuration. NextBridge verifies `Authorization: Bearer <token>` so an unauthenticated client cannot control the bot. Each instance accepts only one reverse connection at a time.
 
 ## Rule channel keys
 
