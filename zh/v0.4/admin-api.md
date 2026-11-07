@@ -82,7 +82,7 @@ global:
 
 仅允许在运行时修改以下键（请求体 `{"keys": {"command_prefix": "nb"}}`）；其它键返回 `400 not_hot_reloadable`，`details` 中给出允许的键集合：
 
-`command_prefix`、`strict_echo_match`、`fuzzy_mention_match`、`mention_notify_control`、`send_timeout`。
+`command_prefix`、`strict_echo_match`、`fuzzy_mention_match`、`mention_notify_control`、`send_timeout`、`sanitize_nickname`。
 
 ## 插件
 

@@ -77,6 +77,7 @@ The `global` section contains configuration options that apply to all drivers un
 | `proxy` | No | — | Global proxy URL for all drivers that ***support proxy configuration*** (e.g., `http://proxy.example.com:8080`). Individual driver proxy settings will override this global setting. |
 | `strict_echo_match` | No | `false` | Controls how NextBridge prevents echoing messages back to the same channel/instance. When `false` (default), skips if target_id == msg.instance_id OR target_channel == msg.channel. When `true`, skips only if target_id == msg.instance_id AND target_channel == msg.channel. Default is `false` to maximize echo prevention. |
 | `fuzzy_mention_match` | No | `false` | Controls whether mentions without exact bind mapping should fall back to fuzzy nickname matching. When `true`, attempts to match mentioned user's name against known display names in the target platform. When `false` (default), only exact ID bounds or native platform mentions work. Default is `false`. |
+| `sanitize_nickname` | No | `true` | Strips non-rendering Unicode characters from sender names before bridging. When `true` (default), control characters, zero-width/format characters (including `U+200B`–`U+200F` and bidi overrides), variation selectors, and line/paragraph separators are removed from `nickname`/`username`, rich-header titles, and QQ forward-node sender names. This prevents names such as `&` + `U+200B` + `killjsj` from corrupting bridged output. Set to `false` only if a platform legitimately needs invisible characters in display names. |
 | `command_prefix` | No | `"nb"` | Prefix for built-in bridge commands (without leading `/`). Changes `/nb bind` to `/<prefix> bind`. |
 | `send_timeout` | No | `2.0` | Maximum time (seconds) a single message send may take before it is offloaded to a background slow-send queue so it no longer blocks subsequent messages. The slow message keeps sending in the background while the main worker moves on. Slow sends are processed by 4 background workers by default. QQ qid values are queried and persisted in the background after forwarding. |
 | `base_url` | No | — | Public base URL for generating externally reachable links (e.g., QQ forward page URLs). Example: `https://bridge.example.com` |
@@ -346,6 +347,7 @@ Some configuration can be reloaded at runtime (via the admin API or a `SIGHUP` s
 - `fuzzy_mention_match`
 - `mention_notify_control`
 - `send_timeout`
+- `sanitize_nickname`
 - The rules file (`rules.yaml`, etc.)
 - Per-instance driver configuration (the driver is rebuilt with the new config)
 

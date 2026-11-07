@@ -77,6 +77,7 @@ uv run main.py validate --config config.yaml --rules rules.yaml
 | `proxy` | 否 | — | 全局代理 URL，适用于所有***支持代理配置***的驱动（例如：`http://proxy.example.com:8080`）。单个驱动的代理设置将覆盖此全局设置。 |
 | `strict_echo_match` | 否 | `false` | 控制 NextBridge 防止 echo (回声) 到同一个频道/实例的行为。当为 `false`（默认）时，如果目标实例 ID 或频道与源消息相同，则跳过；当为 `true` 时，只有当目标实例 ID 和频道都与源消息相同时才跳过。默认为 `false` 以最大程度防止回声。 |
 | `fuzzy_mention_match` | 否 | `false` | 控制在没有精确绑定映射时，是否回退使用昵称进行模糊匹配。当为 `true` 时，会尝试将提及用户的名称与目标平台中已知的显示名称进行匹配。当为 `false`（默认）时，仅精确的 ID 绑定或原生平台内的提及有效。默认为 `false`。 |
+| `sanitize_nickname` | 否 | `true` | 是否在桥接前删除发送者昵称中的不可见字符。当为 `true`（默认）时，会从 `nickname`/`username`、richheader 标题以及 QQ 合并转发节点发送者昵称中删除控制字符、零宽/格式字符（包括 `U+200B`–`U+200F` 与双向控制符）、变体选择符以及行/段分隔符，从而避免诸如 `&` + `U+200B` + `killjsj` 这类昵称在桥接时干扰输出。仅当某平台确实需要在昵称中保留不可见字符时才应关闭。 |
 | `command_prefix` | 否 | `"nb"` | 内置桥接指令的前缀（不含前导 `/`）。例如将 `/nb bind` 改为 `/<前缀> bind`。 |
 | `send_timeout` | 否 | `2.0` | 单条消息发送允许的最长时间（秒）。超过该时间后，消息会被转至后台慢发送队列，不再阻塞后续消息；该慢消息会在后台继续发送。慢发送任务默认由 4 个后台 worker 并发处理。QQ qid 会在消息转发后由后台查询并持久化。 |
 | `base_url` | 否 | — | 生成外部可访问链接时使用的公共基础 URL（如 QQ 合并转发页面链接）。示例：`https://bridge.example.com` |
@@ -346,6 +347,7 @@ NextBridge 内置运行时指标计数器（消息收发数、规则命中数、
 - `fuzzy_mention_match`
 - `mention_notify_control`
 - `send_timeout`
+- `sanitize_nickname`
 - 规则文件（`rules.yaml` 等）
 - 驱动器实例配置（会以新配置重建对应驱动器）
 

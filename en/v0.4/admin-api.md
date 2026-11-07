@@ -82,7 +82,7 @@ To avoid clobbering an edit made outside the API, send the `sha256` you last rea
 
 Only these keys may be changed at runtime (body `{"keys": {"command_prefix": "nb"}}`); anything else returns `400 not_hot_reloadable` with the allowed set in `details`:
 
-`command_prefix`, `strict_echo_match`, `fuzzy_mention_match`, `mention_notify_control`, `send_timeout`.
+`command_prefix`, `strict_echo_match`, `fuzzy_mention_match`, `mention_notify_control`, `send_timeout`, `sanitize_nickname`.
 
 ## Plugins
 
