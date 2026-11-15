@@ -27,6 +27,8 @@ Add under `discord.<instance_id>` in `config.json`:
 | `allow_mentions_users` | No | `true` | Allow `@user` mentions in bridged messages |
 | `allow_mentions_roles` | No | `false` | Allow `@role` mentions in bridged messages |
 | `sanitize_mass_mentions` | No | `true` | Neutralize `@everyone`/`@here` in outgoing message text (replaces with plain text) |
+| `auto_link_image_hosts` | No | `["discordmedia.com", "tenor.com"]` | Host allowlist for receiving messages that contain only one URL. When the host matches, NextBridge tries to resolve the URL to an image and bridges it as an image attachment. Subdomains are included. Set to `[]` to disable. |
+| `auto_link_image_show_original_url` | No | `true` | When auto link-to-image succeeds, keep the original URL before the image. Set to `false` to bridge only the resolved image. |
 | `enable_recall` | No | `true` | Whether to sync message recalls. When enabled, deletions on Discord are detected and bridged to other platforms, and recalls from other platforms are applied to Discord. Set to `false` to disable recall sync. |
 | `media_proxy` | No | — | Proxy URL used only when fetching media/attachments. Defaults to following `proxy` when unset. |
 | `proxy` | No | — | Proxy URL for all Discord API requests (e.g., `http://proxy.example.com:8080` or `socks5://proxy.example.com:1080`). When set, SSL verification is disabled for the proxy connection. Set to `null` to explicitly disable proxy for this instance (ignores global proxy setting). |
@@ -40,6 +42,8 @@ Add under `discord.<instance_id>` in `config.json`:
       "bot_token": "your_bot_token",
       "send_method": "webhook",
       "max_file_size": 8388608,
+      "auto_link_image_hosts": ["discordmedia.com", "tenor.com"],
+      "auto_link_image_show_original_url": true,
       "proxy": "http://proxy.example.com:8080"
     }
   }
@@ -158,4 +162,5 @@ No additional configuration is needed. All stickers and custom emojis are automa
 ## Notes
 
 - Bot messages are automatically ignored (webhook echoes are not re-bridged). Mass mentions (`@everyone`/`@here`) are sanitized by default.
+- Messages that contain only one URL from `auto_link_image_hosts` are resolved like the Discord client preview path. Direct image URLs are bridged as images; HTML pages are scanned for `og:image`/`twitter:image`. If resolving fails, the original text is bridged unchanged.
 - Files are downloaded and re-uploaded via multipart form. If a file exceeds `max_file_size`, its URL is appended to the message text.

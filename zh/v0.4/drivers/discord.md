@@ -27,6 +27,8 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
 | `allow_mentions_users` | 否 | `true` | 允许桥接消息中的 `@user` 提及 |
 | `allow_mentions_roles` | 否 | `false` | 允许桥接消息中的 `@role` 提及 |
 | `sanitize_mass_mentions` | 否 | `true` | 中和传出消息文本中的 `@everyone`/`@here`（替换为纯文本） |
+| `auto_link_image_hosts` | 否 | `["discordmedia.com", "tenor.com"]` | 接收“仅包含一个 URL”的消息时使用的 host 白名单。host 匹配时，NextBridge 会尝试将 URL 解析为图片并作为图片附件桥接。包含子域名。设为 `[]` 可关闭。 |
+| `auto_link_image_show_original_url` | 否 | `true` | 自动链接转图片成功时，是否在图片前保留原 URL。设为 `false` 时只桥接解析出的图片。 |
 | `enable_recall` | 否 | `true` | 是否同步消息撤回。启用后，Discord 上的删除会被检测并桥接到其他平台，其他平台的撤回也会应用到 Discord。设为 `false` 可禁用撤回同步。 |
 | `media_proxy` | 否 | — | 仅用于获取媒体/附件的代理 URL。未设置时默认跟随 `proxy`。 |
 | `proxy` | 否 | — | 所有 Discord API 请求的代理 URL（例如：`http://proxy.example.com:8080` 或 `socks5://proxy.example.com:1080`）。设置后，代理连接将禁用 SSL 验证。设置为 `null` 可显式禁用此实例的代理（忽略全局代理设置）。 |
@@ -40,6 +42,8 @@ Discord 驱动器通过 Discord 网关（Bot Token）接收消息，并支持通
       "bot_token": "your_bot_token",
       "send_method": "webhook",
       "max_file_size": 8388608,
+      "auto_link_image_hosts": ["discordmedia.com", "tenor.com"],
+      "auto_link_image_show_original_url": true,
       "proxy": "http://proxy.example.com:8080"
     }
   }
@@ -158,4 +162,5 @@ Discord 贴纸（Sticker）和自定义表情（Custom Emoji）会自动转换�
 ## 注意事项
 
 - Bot 发送的消息不会被再次桥接（Webhook 回显不会触发事件）。
+- 仅包含一个 `auto_link_image_hosts` 白名单 URL 的消息会按 Discord 客户端预览方式解析。直接图片 URL 会作为图片桥接；HTML 页面会尝试读取 `og:image`/`twitter:image`。解析失败时保留原始文本桥接。
 - 文件会被下载后通过 multipart 表单重新上传。若文件超过 `max_file_size`，其 URL 将以文字形式附加到消息中。

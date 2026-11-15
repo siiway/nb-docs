@@ -64,6 +64,7 @@ Telegram 驱动器使用 [python-telegram-bot](https://python-telegram-bot.org/)
 | 音频（Audio） | `voice` |
 | 文件（Document） | `file` |
 | 动图/GIF（Animation） | `video` |
+| 贴纸（Sticker） | `image`（静态贴纸）/ 文本 emoji（动态/视频贴纸或获取失败时） |
 
 带媒体的消息可能包含说明文字（Caption），该文字作为消息文本处理。
 

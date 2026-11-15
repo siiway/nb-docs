@@ -64,6 +64,7 @@ Use under `channels` or `from`/`to` in `rules.json`:
 | Audio | `voice` |
 | Document | `file` |
 | Animation (GIF) | `video` |
+| Sticker | `image` (static sticker) / text emoji (animated/video sticker or fetch failure) |
 
 Media messages may include a caption, which becomes the message text.
 
